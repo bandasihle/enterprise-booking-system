@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.1"
+    xmlns="https://jakarta.ee/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+    https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd">
+
+    <persistence-unit name="ebs-PU" transaction-type="JTA">
+
+        <!-- GlassFish JDBC Resource - configure this in GlassFish admin console -->
+        <jta-data-source>jdbc/ebsDS</jta-data-source>
+
+        <!-- JPA Entity Classes -->
+        <class>com.ebs.entity.User</class>
+        <class>com.ebs.entity.Student</class>
+        <class>com.ebs.entity.Lecturer</class>
+        <class>com.ebs.entity.Admin</class>
+        <class>com.ebs.entity.Lab</class>
+        <class>com.ebs.entity.Seat</class>
+        <class>com.ebs.entity.Booking</class>
+        <class>com.ebs.entity.OtpToken</class>
+        <class>com.ebs.entity.Complaint</class>
+
+        <properties>
+            <!-- Auto-create/update tables from entities -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            <!-- Log SQL to console during development -->
+            <property name="eclipselink.logging.level.sql" value="FINE"/>
+            <property name="eclipselink.logging.parameters" value="true"/>
+        </properties>
+
+    </persistence-unit>
+</persistence>
