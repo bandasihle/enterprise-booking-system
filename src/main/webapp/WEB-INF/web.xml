@@ -9,7 +9,7 @@
 
     <!-- Default welcome page -->
     <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
+        <welcome-file>test-index.html</welcome-file>
     </welcome-file-list>
 
     <!-- Session timeout: 30 minutes -->
