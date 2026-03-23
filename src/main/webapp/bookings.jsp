@@ -1,0 +1,140 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Bookings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+  <header class="top-navbar">
+    <div class="nav-left">
+      <div class="brand">
+        <div class="brand-icon">
+          <img src="images/logooo.jpeg" alt="EBS Logo">
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="brand-text">EBS Admin</div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="index.jsp" class="nav-item">Dashboard</a>
+        <a href="users.jsp" class="nav-item">Users</a>
+        <a href="bookings.jsp" class="nav-item active">Bookings</a>
+        <a href="resources.jsp" class="nav-item">Resources</a>
+        <a href="complaints.jsp" class="nav-item">Complaints</a>
+      </nav>
+    </div>
+
+    <div class="nav-right">
+      <a href="#" class="right-link">All EBS</a>
+      <div class="search-wrap">
+        <input type="text" class="search-box" placeholder="Search" />
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div>
+        <h1>Bookings</h1>
+        <p>Track and manage all seat bookings</p>
+      </div>
+
+      <div class="topbar-right">
+        <input type="text" class="search-box" placeholder="Search bookings..." />
+      </div>
+    </header>
+
+    <section class="stats-grid three-grid">
+      <div class="stat-card">
+        <h3>Approved</h3>
+        <p class="stat-number">210</p>
+        <span class="stat-note success-text">Confirmed seats</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Pending</h3>
+        <p class="stat-number">56</p>
+        <span class="stat-note warning-text">Awaiting action</span>
+      </div>
+
+      <div class="stat-card">
+        <h3>Cancelled</h3>
+        <p class="stat-number">18</p>
+        <span class="stat-note danger-text">Declined or removed</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Booking Records</h2>
+        <button class="panel-btn">Export</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Lab</th>
+              <th>Seat</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Zwivhuya N.</td>
+              <td>Lab 1</td>
+              <td>A12</td>
+              <td>07 Mar 2026</td>
+              <td>08:00 - 10:00</td>
+              <td><span class="badge success">Approved</span></td>
+              <td><button class="table-btn">View</button></td>
+            </tr>
+            <tr>
+              <td>Lerato M.</td>
+              <td>Lab 2</td>
+              <td>B05</td>
+              <td>07 Mar 2026</td>
+              <td>10:00 - 12:00</td>
+              <td><span class="badge warning">Pending</span></td>
+              <td><button class="table-btn">Approve</button></td>
+            </tr>
+            <tr>
+              <td>Thabo K.</td>
+              <td>Lab 3</td>
+              <td>C08</td>
+              <td>07 Mar 2026</td>
+              <td>13:00 - 15:00</td>
+              <td><span class="badge success">Approved</span></td>
+              <td><button class="table-btn">View</button></td>
+            </tr>
+            <tr>
+              <td>Ayanda P.</td>
+              <td>Lab 1</td>
+              <td>D02</td>
+              <td>07 Mar 2026</td>
+              <td>15:00 - 17:00</td>
+              <td><span class="badge danger">Cancelled</span></td>
+              <td><button class="table-btn">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
