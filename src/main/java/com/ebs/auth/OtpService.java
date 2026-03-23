@@ -1,4 +1,5 @@
-﻿package com.ebs.auth;
+package com.ebs.auth;
+
 
 import com.ebs.entity.OtpToken;
 import jakarta.ejb.Stateless;
