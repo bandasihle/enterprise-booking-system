@@ -315,7 +315,7 @@
     </div>
     <div class="vis-card">
       <div class="hero-bg-img">
-        <img src="assets/BACK77.webp" alt="Booking System Visual"/>
+        <img src="assets/logo.jpg" alt="Booking System Visual"/>
         <div class="hero-img-overlay"></div>
       </div>
       <div class="hero-img-content"></div>
