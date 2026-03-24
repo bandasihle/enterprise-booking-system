@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+
 /**
  * WebSocket endpoint for real-time seat availability updates.
  * When a seat is booked or released, ALL connected clients receive

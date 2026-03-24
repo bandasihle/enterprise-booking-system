@@ -1,5 +1,4 @@
 package com.ebs.ejb;
-
 import com.ebs.entity.*;
 import com.ebs.websocket.SeatAvailabilityBroadcaster;
 import jakarta.ejb.Stateless;

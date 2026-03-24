@@ -28,6 +28,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   font-family: 'Plus Jakarta Sans', sans-serif;
   background: var(--bg);
   color: var(--text);
@@ -224,25 +226,23 @@ nav {
 
 .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
 
+
+
 /* ── SPLIT PAGE LAYOUT ── */
 .split-page {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: calc(100vh - 68px);
+  display: flex;
+  align-items: stretch; 
+  min-height: calc(100vh - 68px - 68px); /* Height minus Nav and Footer */
+  background: var(--bg);
 }
-
-.dc { position: absolute; border-radius: 50%; }
-.dc1 { width: 300px; height: 300px; bottom: -80px; right: -80px; }
-.dc2 { width: 170px; height: 170px; bottom:  40px; right:  10px; }
-.dc3 { width:  72px; height:  72px; top:     40px; right:  60px; }
 
 /* ── LEFT PANEL ── */
 .left-panel {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 60px 52px;
+  justify-content: flex-start; /* Forces text to the top */
+  padding: 80px 52px; /* 80px top padding pushes it down just enough */
   position: relative;
   overflow: hidden;
 }
@@ -301,35 +301,36 @@ nav {
   flex-shrink: 0;
 }
 
+/* ── DECORATIVE CIRCLES ── */
+.dc { position: absolute; border-radius: 50%; z-index: 0; }
+.dc1 { width: 300px; height: 300px; top: -50px; left: -50px; opacity: 0.4; } 
+.dc2 { width: 170px; height: 170px; bottom: 60px; right: 10px; }
+.dc3 { width: 72px; height: 72px; top: 150px; right: 60px; }
+
 /* ── RIGHT PANEL ── */
 .right-panel {
+  flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 32px;
-  overflow-y: auto;
+  flex-direction: column;
+  align-items: center; 
+  justify-content: flex-start; /* Forces form to the top */
+  padding: 80px 32px; /* 80px top padding matches the left side */
+  background: var(--bg);
 }
 
-.form-box {
+.form-box, .login-card {
   width: 100%;
   max-width: 440px;
+  margin-top: 0; /* Ensures it doesn't push itself down */
 }
 
-.form-title {
-  font-size: 24px;
-  font-weight: 800;
-  margin-bottom: 4px;
+.login-card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 44px 40px;
+  box-shadow: 0 8px 40px rgba(15,23,42,0.08);
+  border: 1px solid var(--border);
 }
-
-.form-sub {
-  font-size: 14px;
-  color: var(--muted);
-  margin-bottom: 24px;
-}
-
-.form-sub a { color: var(--blue); font-weight: 700; text-decoration: none; }
-.form-sub a:hover { text-decoration: underline; }
-
 /* ── TOAST ── */
 .toast {
   border-radius: 10px;
@@ -405,15 +406,16 @@ input.s     { border-color: var(--success); }
 
 /* ── FOOTER ── */
 footer {
-  background: #0F172A;
-  color: rgba(255,255,255,0.45);
+  background: white;
+  color: #666;
   text-align: center;
   padding: 22px 48px;
   font-size: 13px;
+  margin-top: auto;
 }
 
-footer a { color: rgba(255,255,255,0.6); text-decoration: none; margin: 0 10px; }
-footer a:hover { color: white; }
+footer a { color:var(--blue) ; text-decoration: none; margin: 0 10px; }
+footer a:hover { color: var(--blue-hover); }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {

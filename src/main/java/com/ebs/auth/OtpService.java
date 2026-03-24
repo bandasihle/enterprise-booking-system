@@ -1,3 +1,4 @@
+
 package com.ebs.auth;
 
 import com.ebs.entity.OtpToken;
