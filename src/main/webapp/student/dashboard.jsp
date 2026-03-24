@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EBS | Student Dashboard</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/CSS/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -18,9 +18,9 @@
         <span>EBS</span>
     </div>
     <div class="nav-links">
-        <a href="${pageContext.request.contextPath}/student/dashboard" class="active">Dashboard</a>
-        <a href="${pageContext.request.contextPath}/student/booking">Book Seat</a>
-        <a href="${pageContext.request.contextPath}/student/mybookings">My Bookings</a>
+        <a href="${pageContext.request.contextPath}/student/dashboard.jsp" class="active">Dashboard</a>
+        <a href="${pageContext.request.contextPath}/student/booking.jsp">Book Seat</a>
+        <a href="${pageContext.request.contextPath}/student/mybooking.jsp">My Bookings</a>
     </div>
 </nav>
 
