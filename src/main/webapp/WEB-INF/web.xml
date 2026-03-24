@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
@@ -7,49 +7,15 @@
 
     <display-name>Enterprise Booking System</display-name>
 
-    <!-- Default welcome page -->
     <welcome-file-list>
         <welcome-file>test-index.html</welcome-file>
     </welcome-file-list>
 
-    <!-- Session timeout: 30 minutes -->
     <session-config>
         <session-timeout>30</session-timeout>
         <cookie-config>
             <http-only>true</http-only>
-            <secure>false</secure> <!-- Set to true in production with HTTPS -->
-        </cookie-config>
+            <secure>false</secure> </cookie-config>
     </session-config>
 
-    <!-- Protect role-specific pages -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Student Pages</web-resource-name>
-            <url-pattern>/pages/student/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>STUDENT</role-name>
-        </auth-constraint>
-    </security-constraint>
-
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Lecturer Pages</web-resource-name>
-            <url-pattern>/pages/lecturer/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>LECTURER</role-name>
-        </auth-constraint>
-    </security-constraint>
-
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Admin Pages</web-resource-name>
-            <url-pattern>/pages/admin/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>ADMIN</role-name>
-        </auth-constraint>
-    </security-constraint>
-
-</web-app>
+    </web-app>

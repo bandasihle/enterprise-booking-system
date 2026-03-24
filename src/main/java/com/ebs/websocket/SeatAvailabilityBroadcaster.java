@@ -1,4 +1,4 @@
-﻿package com.ebs.websocket;
+package com.ebs.websocket;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.websocket.*;

@@ -22,4 +22,6 @@
       <description>Keep a copy of the generated servlet class' java code.</description>
     </property>
   </jsp-config>
+  <context-root>/EnterpriseBookingSystem</context-root>
 </glassfish-web-app>
+ 

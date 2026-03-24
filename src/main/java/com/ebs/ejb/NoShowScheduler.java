@@ -1,4 +1,4 @@
-﻿package com.ebs.ejb;
+package com.ebs.ejb;
 
 import com.ebs.entity.Booking;
 import jakarta.ejb.Schedule;

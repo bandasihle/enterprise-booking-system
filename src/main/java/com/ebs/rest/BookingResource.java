@@ -1,4 +1,4 @@
-﻿package com.ebs.rest;
+package com.ebs.rest;
 
 import com.ebs.ejb.BookingService;
 import com.ebs.entity.Booking;

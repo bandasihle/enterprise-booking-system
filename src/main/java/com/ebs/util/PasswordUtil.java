@@ -1,4 +1,4 @@
-﻿package com.ebs.util;
+package com.ebs.util;
 
 import java.security.MessageDigest;
 import java.security.SecureRandom;

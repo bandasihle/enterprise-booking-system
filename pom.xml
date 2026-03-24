@@ -62,7 +62,7 @@
     </dependencies>
 
     <build>
-        <finalName>ebs</finalName>
+        <finalName>Enterprise Booking System</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
