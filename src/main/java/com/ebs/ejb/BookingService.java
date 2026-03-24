@@ -1,5 +1,4 @@
-﻿package com.ebs.ejb;
-
+package com.ebs.ejb;
 import com.ebs.entity.*;
 import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
