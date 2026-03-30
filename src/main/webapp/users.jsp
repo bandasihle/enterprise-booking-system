@@ -1,0 +1,154 @@
+<%-- 
+    Document   : users
+    Created on : 29 Mar 2026, 22:26:00
+    Author     : axole
+--%>
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Users</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+  <header class="top-navbar">
+    <div class="nav-left">
+
+      <div class="brand">
+        <div class="brand-icon">
+          <img src="images/logooo.jpeg" alt="EBS Logo">
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="brand-text">EBS Admin</div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="dashboard.jsp" class="nav-item">Dashboard</a>
+        <a href="users.jsp" class="nav-item active">Users</a>
+        <a href="bookings.jsp" class="nav-item">Bookings</a>
+        <a href="resources.jsp" class="nav-item">Resources</a>
+        <a href="complaints.jsp" class="nav-item">Complaints</a>
+      </nav>
+
+    </div>
+
+    <div class="nav-right">
+      <a href="#" class="right-link">All EBS</a>
+
+      <div class="search-wrap">
+        <input type="text" class="search-box" placeholder="Search" />
+      </div>
+    </div>
+  </header>
+
+
+  <main class="main-content">
+
+    <section class="users-page-header">
+
+      <div class="users-header-text">
+        <h1>Users</h1>
+        <p>Manage administrators and students</p>
+      </div>
+
+      <div class="users-header-actions">
+        <input type="text" class="users-search-box" placeholder="Search users..." />
+        <button class="primary-btn">+ Add User</button>
+      </div>
+
+    </section>
+
+
+    <section class="panel">
+
+      <div class="panel-header">
+        <h2>All Users</h2>
+
+        <div class="filters">
+          <button class="filter-btn active-filter">All</button>
+          <button class="filter-btn">Students</button>
+          <button class="filter-btn">Admins</button>
+        </div>
+      </div>
+
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Last Login</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr>
+              <td>Admin One</td>
+              <td>admin1@ebs.com</td>
+              <td>Administrator</td>
+              <td><span class="badge success">Active</span></td>
+              <td>Today, 10:20</td>
+              <td><button class="table-btn">Edit</button></td>
+            </tr>
+
+            <tr>
+              <td>Zwivhuya N.</td>
+              <td>zwivhuya@ump.ac.za</td>
+              <td>Student</td>
+              <td><span class="badge success">Active</span></td>
+              <td>Today, 09:10</td>
+              <td><button class="table-btn">Edit</button></td>
+            </tr>
+
+            <tr>
+              <td>Lerato M.</td>
+              <td>lerato@ump.ac.za</td>
+              <td>Student</td>
+              <td><span class="badge warning">Inactive</span></td>
+              <td>Yesterday</td>
+              <td><button class="table-btn">Edit</button></td>
+            </tr>
+
+            <tr>
+              <td>Thabo K.</td>
+              <td>thabo@ump.ac.za</td>
+              <td>Student</td>
+              <td><span class="badge success">Active</span></td>
+              <td>2 days ago</td>
+              <td><button class="table-btn">Edit</button></td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script src="js/admin.js"></script>
+
+</body>
+</html>
