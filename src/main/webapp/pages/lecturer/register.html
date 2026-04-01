@@ -192,7 +192,7 @@ footer a:hover {
           <label for="email">Email Address</label>
           <div class="iw">
             <span class="ii">✉️</span>
-            <input type="email" id="email" placeholder="staff@example.com/staff@universityofmpumalanga.onmicrosoft.com"/>
+            <input type="email" id="email" placeholder="staff@ump.ac.za/staff@universityofmpumalanga.onmicrosoft.com"/>
           </div>
           <div class="fmsg" id="email-err">Please enter a valid email address.</div>
         </div>
@@ -280,6 +280,11 @@ footer a:hover {
   }
 
   const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  /*validation for email 01/4 EDITR*/
+  const isLecturerEmail = email => {
+  if (!isEmail(email)) return false;
+  return email.endsWith('@ump.ac.za') || email.endsWith('@universityofmpumalanga.onmicrosoft.com');
+};
 
   function setErr(iid, mid, on) {
     document.getElementById(iid).classList.toggle('e', on);
@@ -372,7 +377,11 @@ footer a:hover {
     let ok = true;
 
     if (!uid)            { setErr('uid',  'uid-err',   true); ok=false; } else setErr('uid',  'uid-err',   false);
-    if (!isEmail(email)) { setErr('email','email-err', true); ok=false; } else setErr('email','email-err', false);
+    if (!isLecturerEmail(email)) { 
+  setErr('email','email-err', true); 
+  document.getElementById('email-err').textContent = 'Use your UMP email only.';
+  ok = false; 
+} else setErr('email','email-err', false);
     if (pw.length < 8)   { setErr('pw',  'pw-err',    true); ok=false; } else setErr('pw',  'pw-err',    false);
     if (pw !== cpw)      { setErr('cpw', 'cpw-err',   true); ok=false; } else setErr('cpw', 'cpw-err',   false);
     if (!terms) { document.getElementById('terms-err').classList.add('show');    ok=false; }
@@ -441,6 +450,20 @@ footer a:hover {
     if (document.getElementById('step2').style.display === 'block') doVerify();
     else doRegister();
   });
+  //EDIT R 01/4
+  const emailInput = document.getElementById('email');
+emailInput.addEventListener('input', () => {
+  const val = emailInput.value.trim();
+  if (!val) {
+    setErr('email', 'email-err', true);
+    document.getElementById('email-err').textContent = 'Email is required.';
+  } else if (!isLecturerEmail(val)) {
+    setErr('email', 'email-err', true);
+    document.getElementById('email-err').textContent = 'Use your UMP email only.';
+  } else {
+    setErr('email', 'email-err', false);
+  }
+});
 </script>
 </body>
 </html>

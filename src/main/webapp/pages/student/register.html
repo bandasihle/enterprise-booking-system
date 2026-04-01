@@ -194,7 +194,7 @@ footer a:hover {
             <span class="ii">✉️</span>
             <input type="email" id="email" placeholder="200000000@ump.ac.za"/>
           </div>
-          <div class="fmsg" id="email-err">Please enter a valid email address.</div>
+          <div class="fmsg" id="email-err">Please enter a valid UMP student email(e.g., 200123456@ump.ac.za).</div>
         </div>
 
         <div class="field">
@@ -280,7 +280,8 @@ footer a:hover {
   }
 
   const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-
+  const isStudentEmail = v => /^[0-9]{9}@ump\.ac\.za$/.test(v);
+/*1/04 EDITR TOP isStudent Line*/
   function setErr(iid, mid, on) {
     document.getElementById(iid).classList.toggle('e', on);
     document.getElementById(mid).classList.toggle('show', on);
@@ -372,7 +373,13 @@ footer a:hover {
     let ok = true;
 
     if (!uid)            { setErr('uid',  'uid-err',   true); ok=false; } else setErr('uid',  'uid-err',   false);
-    if (!isEmail(email)) { setErr('email','email-err', true); ok=false; } else setErr('email','email-err', false);
+    if (!isStudentEmail(email)) { 
+  setErr('email','email-err', true); 
+  ok=false; 
+} else {
+  setErr('email','email-err', false);
+}
+    /*replaced:if (!isEmail(email)) { setErr('email','email-err', true); ok=false; } else setErr('email','email-err', false);*/
     if (pw.length < 8)   { setErr('pw',  'pw-err',    true); ok=false; } else setErr('pw',  'pw-err',    false);
     if (pw !== cpw)      { setErr('cpw', 'cpw-err',   true); ok=false; } else setErr('cpw', 'cpw-err',   false);
     if (!terms) { document.getElementById('terms-err').classList.add('show');    ok=false; }
@@ -441,6 +448,17 @@ footer a:hover {
     if (document.getElementById('step2').style.display === 'block') doVerify();
     else doRegister();
   });
+          
+   /*1/04 EDIT R*/
+  document.getElementById('email').addEventListener('input', function() {
+  const emailVal = this.value.trim();
+  if (!isStudentEmail(emailVal)) {
+    setErr('email', 'email-err', true);
+  } else {
+    setErr('email', 'email-err', false);
+  }
+    
+        });
 </script>
 </body>
 </html>
