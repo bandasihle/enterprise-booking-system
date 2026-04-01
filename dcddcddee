@@ -1,0 +1,6 @@
+[33m93cf289[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32madmin_dashboard_backend[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/feature/lecturer-dashboard[m[33m, [m[1;31morigin/admin_dashboard_backend[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: checkout: moving from admin_dashboard_backend to admin_dashboard_backend
+[33m93cf289[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32madmin_dashboard_backend[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/feature/lecturer-dashboard[m[33m, [m[1;31morigin/admin_dashboard_backend[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{1}: checkout: moving from master to admin_dashboard_backend
+[33m4cd3fd8[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{2}: checkout: moving from admin_dashboard_backend to master
+[33m93cf289[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32madmin_dashboard_backend[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/feature/lecturer-dashboard[m[33m, [m[1;31morigin/admin_dashboard_backend[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{3}: checkout: moving from master to admin_dashboard_backend
+[33m4cd3fd8[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{4}: reset: moving to HEAD
+[33m4cd3fd8[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{5}: commit (initial): Initial commit

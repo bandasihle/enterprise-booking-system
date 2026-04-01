@@ -1,0 +1,28 @@
+[33m9c3a398[m[33m ([m[1;31morigin/feature/auth-and-ui[m[33m)[m feat(auth): implement end-to-end OTP email registration and login flow
+[33mcfc3943[m[33m ([m[1;35mrefs/stash[m[33m)[m WIP on master: 4cd3fd8 Initial commit
+[33m141de4d[m index on master: 4cd3fd8 Initial commit
+[33m4cd3fd8[m[33m ([m[1;32mmaster[m[33m)[m Initial commit
+[33m0f1785d[m merging user dashboard for student after student login
+[33md2e7461[m "chore: force merged customer-dashboard and resolved conflicts"
+[33m367f8c0[m Merge remote-tracking branch 'origin/feature/customer-dashboard' into feature/auth-and-ui
+[33md07b55c[m ui and backend merged
+[33m416ea55[m chore: resolve merge conflicts with login-page
+[33m1b98f69[m Merge remote-tracking branch 'origin/feature/login-page' into feature/auth-and-ui
+[33m091b5da[m feat: implement registration OTP flow and single-step login
+[33mc9dc11e[m[33m ([m[1;31morigin/feature/customer-dashboard[m[33m)[m Delete src/main/webapp/index.html
+[33m437bc73[m Remove HTML content from index.html
+[33m9633fe9[m[33m ([m[1;31morigin/feature/login-page[m[33m)[m UI/UX Overhaul: Aligned login cards and cleaned up role selection
+[33mcd1ffe7[m[33m ([m[1;31morigin/admin-dashboard[m[33m)[m Initial commit to admin dashboard
+[33m7f7eb5a[m initial commit to admin dashboard
+[33mefd604e[m wip: homepage fixes and navigation updates
+[33m62349a7[m chore: add gitignore
+[33m6eaea58[m feat: student dashboard - servlets, JSPs, EJBs, DTOs, CSS
+[33m6f0d74f[m feat: remove index.html, add index.jsp, frontend folders, and test HTML pages
+[33m93cf289[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32madmin_dashboard_backend[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/feature/lecturer-dashboard[m[33m, [m[1;31morigin/admin_dashboard_backend[m[33m, [m[1;31morigin/HEAD[m[33m)[m Create dashboard.html
+[33m24da9b3[m Create dashboard.html
+[33mddd34ed[m Create login.html
+[33m95d1aa3[m Create register.html
+[33m988b561[m[33m ([m[1;31morigin/feature/frontend-design[m[33m)[m Fix typo in dashboard.html filename
+[33m88d8cc0[m Create dasboard.html
+[33m5ba9971[m added mysql database scripts and connection
+[33m54b5c70[m feat: initial project scaffold - Jakarta EE 10, GlassFish 7, MySQL
