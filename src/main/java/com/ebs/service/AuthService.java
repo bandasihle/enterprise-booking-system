@@ -12,7 +12,9 @@ import com.ebs.entity.OtpToken;
 import com.ebs.entity.Student;
 import com.ebs.entity.User;
 import com.ebs.rest.AuthResource.RegisterRequest;
+import com.ebs.util.EmailService;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -22,6 +24,9 @@ import java.util.Random;
 
 @RequestScoped
 public class AuthService {
+    
+    @Inject
+    private EmailService emailService;
 
     @PersistenceContext(unitName = "ebs-PU")
     private EntityManager em;
@@ -95,7 +100,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void generateAndSendOtp(String email) {
+    public void generateAndSendOtp(String email) throws Exception {
         String otpCode = String.format("%06d", new Random().nextInt(999999));
         
         OtpToken otpToken = new OtpToken();
@@ -104,10 +109,9 @@ public class AuthService {
         otpToken.setExpiresAt(LocalDateTime.now().plusMinutes(10));
         em.persist(otpToken);
         
-        System.out.println("=========================================");
-        System.out.println("🔒 MOCK EMAIL DISPATCHER");
-        System.out.println("To: " + email);
-        System.out.println("Your Registration OTP is: " + otpCode);
-        System.out.println("=========================================");
+        // --- THE REAL EMAIL DISPATCH ---
+        System.out.println("Attempting to send real email to: " + email);
+        emailService.sendOtpEmail(email, otpCode);
+        System.out.println("Email sent successfully!");
     }
 }
