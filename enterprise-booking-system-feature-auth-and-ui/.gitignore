@@ -1,0 +1,36 @@
+﻿# Maven build output
+target/
+*.class
+
+# NetBeans project files
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+nb-configuration.xml
+
+# GlassFish / Payara
+*.war
+*.ear
+*.jar
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.suo
+*.user
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / secrets - NEVER commit these
+glassfish-resources.xml
+*.env
+application.properties
+
+# Log files
+*.log

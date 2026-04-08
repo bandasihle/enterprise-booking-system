@@ -1,0 +1,43 @@
+[
+  { "id": 1,  "seatLabel": "PC-01", "rowPos": 1, "colPos": 2, "status": "available" },
+  { "id": 2,  "seatLabel": "PC-02", "rowPos": 1, "colPos": 3, "status": "available" },
+  { "id": 3,  "seatLabel": "PC-03", "rowPos": 1, "colPos": 4, "status": "available" },
+  { "id": 4,  "seatLabel": "PC-04", "rowPos": 1, "colPos": 5, "status": "available" },
+  { "id": 5,  "seatLabel": "PC-05", "rowPos": 1, "colPos": 6, "status": "available" },
+
+  { "id": 6,  "seatLabel": "PC-06", "rowPos": 3, "colPos": 2, "status": "available" },
+  { "id": 7,  "seatLabel": "PC-07", "rowPos": 3, "colPos": 3, "status": "available" },
+  { "id": 8,  "seatLabel": "PC-08", "rowPos": 3, "colPos": 4, "status": "available" },
+  { "id": 9,  "seatLabel": "PC-09", "rowPos": 3, "colPos": 5, "status": "available" },
+  { "id": 10, "seatLabel": "PC-10", "rowPos": 3, "colPos": 6, "status": "available" },
+
+  { "id": 11, "seatLabel": "PC-11", "rowPos": 4, "colPos": 2, "status": "available" },
+  { "id": 12, "seatLabel": "PC-12", "rowPos": 4, "colPos": 3, "status": "available" },
+  { "id": 13, "seatLabel": "PC-13", "rowPos": 4, "colPos": 4, "status": "available" },
+  { "id": 14, "seatLabel": "PC-14", "rowPos": 4, "colPos": 5, "status": "available" },
+  { "id": 15, "seatLabel": "PC-15", "rowPos": 4, "colPos": 6, "status": "available" },
+
+  { "id": 16, "seatLabel": "PC-16", "rowPos": 6, "colPos": 2, "status": "available" },
+  { "id": 17, "seatLabel": "PC-17", "rowPos": 6, "colPos": 3, "status": "available" },
+  { "id": 18, "seatLabel": "PC-18", "rowPos": 6, "colPos": 4, "status": "available" },
+  { "id": 19, "seatLabel": "PC-19", "rowPos": 6, "colPos": 5, "status": "available" },
+  { "id": 20, "seatLabel": "PC-20", "rowPos": 6, "colPos": 6, "status": "available" },
+
+  { "id": 21, "seatLabel": "PC-21", "rowPos": 8, "colPos": 1, "status": "available" },
+  { "id": 22, "seatLabel": "PC-22", "rowPos": 8, "colPos": 2, "status": "available" },
+  { "id": 23, "seatLabel": "PC-23", "rowPos": 8, "colPos": 3, "status": "available" },
+  { "id": 24, "seatLabel": "PC-24", "rowPos": 8, "colPos": 4, "status": "available" },
+  { "id": 25, "seatLabel": "PC-25", "rowPos": 8, "colPos": 5, "status": "available" },
+  { "id": 26, "seatLabel": "PC-26", "rowPos": 8, "colPos": 6, "status": "available" },
+  { "id": 27, "seatLabel": "PC-27", "rowPos": 8, "colPos": 7, "status": "available" },
+
+  { "id": 28, "seatLabel": "PC-28", "rowPos": 1, "colPos": 9, "status": "available" },
+  { "id": 29, "seatLabel": "PC-29", "rowPos": 2, "colPos": 9, "status": "available" },
+  { "id": 30, "seatLabel": "PC-30", "rowPos": 3, "colPos": 9, "status": "available" },
+  { "id": 31, "seatLabel": "PC-31", "rowPos": 4, "colPos": 9, "status": "available" },
+  { "id": 32, "seatLabel": "PC-32", "rowPos": 5, "colPos": 9, "status": "available" },
+  { "id": 33, "seatLabel": "PC-33", "rowPos": 6, "colPos": 9, "status": "available" },
+  { "id": 34, "seatLabel": "PC-34", "rowPos": 7, "colPos": 9, "status": "available" },
+  { "id": 35, "seatLabel": "PC-35", "rowPos": 8, "colPos": 9, "status": "available" },
+  { "id": 36, "seatLabel": "PC-36", "rowPos": 9, "colPos": 9, "status": "available" }
+]  
