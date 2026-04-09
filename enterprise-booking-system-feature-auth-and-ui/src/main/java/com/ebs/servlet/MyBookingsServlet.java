@@ -13,10 +13,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * GET  /student/mybookings              — renders booking history via mybooking.jsp
+ * GET  /student/mybookings              — loads bookings from DB, splits into
+ *                                         upcoming / past / cancelled, forwards to mybooking.jsp
  * POST /student/mybookings?action=cancel — cancels a booking; PRG on success
  */
 @WebServlet("/student/mybookings")
@@ -30,15 +33,40 @@ public class MyBookingsServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Long studentId = getStudentId(req);
-        if (studentId == null) { resp.sendRedirect(req.getContextPath() + "/index.html"); return; }
+        if (studentId == null) {
+            resp.sendRedirect(req.getContextPath() + "/pages/student/login.jsp");
+            return;
+        }
 
         try {
-            List<BookingDTO> bookings = dashboardService.getStudentBookings(studentId);
-            req.setAttribute("bookings", bookings);
+            List<BookingDTO> all = dashboardService.getStudentBookings(studentId);
+            LocalDateTime now   = LocalDateTime.now();
+
+            // Split into three lists for the three tabs
+            List<BookingDTO> upcoming = all.stream()
+                    .filter(b -> "CONFIRMED".equals(b.getStatus()) && b.getStartTime().isAfter(now))
+                    .collect(Collectors.toList());
+
+            List<BookingDTO> past = all.stream()
+                    .filter(b -> ("CONFIRMED".equals(b.getStatus()) || "COMPLETED".equals(b.getStatus())
+                                  || "NO_SHOW".equals(b.getStatus()))
+                              && !b.getStartTime().isAfter(now))
+                    .collect(Collectors.toList());
+
+            List<BookingDTO> cancelled = all.stream()
+                    .filter(b -> "CANCELLED".equals(b.getStatus()))
+                    .collect(Collectors.toList());
+
+            req.setAttribute("upcomingBookings",  upcoming);
+            req.setAttribute("pastBookings",      past);
+            req.setAttribute("cancelledBookings", cancelled);
+            req.setAttribute("totalBookings",     all.size());
+
         } catch (Exception e) {
             req.setAttribute("loadError", true);
         }
 
+        // Flash message from previous redirect
         HttpSession session = req.getSession(false);
         if (session != null) {
             req.setAttribute("flash", session.getAttribute("flash"));
@@ -53,7 +81,10 @@ public class MyBookingsServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Long studentId = getStudentId(req);
-        if (studentId == null) { resp.sendRedirect(req.getContextPath() + "/index.html"); return; }
+        if (studentId == null) {
+            resp.sendRedirect(req.getContextPath() + "/pages/student/login.jsp");
+            return;
+        }
 
         if ("cancel".equals(req.getParameter("action"))) {
             try {
@@ -63,28 +94,22 @@ public class MyBookingsServlet extends HttpServlet {
                 resp.sendRedirect(req.getContextPath() + "/student/mybookings");
 
             } catch (NumberFormatException e) {
-                forwardWithError(req, resp, studentId, "Invalid booking ID.");
+                req.getSession().setAttribute("flash", "Invalid booking ID.");
+                resp.sendRedirect(req.getContextPath() + "/student/mybookings");
             } catch (EJBException e) {
                 Throwable cause = e.getCause();
                 String msg = (cause instanceof IllegalArgumentException)
-                        ? "Booking not found." : "Could not cancel this booking.";
-                forwardWithError(req, resp, studentId, msg);
+                        ? "Booking not found."
+                        : "Could not cancel this booking.";
+                req.getSession().setAttribute("flash", msg);
+                resp.sendRedirect(req.getContextPath() + "/student/mybookings");
             } catch (Exception e) {
-                forwardWithError(req, resp, studentId, "An unexpected error occurred.");
+                req.getSession().setAttribute("flash", "An unexpected error occurred.");
+                resp.sendRedirect(req.getContextPath() + "/student/mybookings");
             }
         } else {
             resp.sendRedirect(req.getContextPath() + "/student/mybookings");
         }
-    }
-
-    private void forwardWithError(HttpServletRequest req, HttpServletResponse resp,
-                                   Long studentId, String msg)
-            throws ServletException, IOException {
-        try {
-            req.setAttribute("bookings", dashboardService.getStudentBookings(studentId));
-        } catch (Exception ignored) {}
-        req.setAttribute("error", msg);
-        req.getRequestDispatcher("/student/mybooking.jsp").forward(req, resp);
     }
 
     private Long getStudentId(HttpServletRequest req) {

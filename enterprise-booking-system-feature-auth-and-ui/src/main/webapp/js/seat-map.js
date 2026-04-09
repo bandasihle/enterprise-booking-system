@@ -2,7 +2,6 @@
     const ctx = window.EBS_CONTEXT || '';
     const DATA_BASE = `${ctx}/data`;
 
-    const STORAGE_KEY = 'ebs_student_bookings';
     let currentLabId = '';
     let currentLabName = '';
     let currentSelectedSeat = null;
@@ -21,23 +20,30 @@
         await loadSlots();
 
         try {
-            const res = await fetch(`${DATA_BASE}/labs.json`);
-            const labs = await res.json();
             const select = document.getElementById('labSelect');
             if (!select) return;
 
-            const existingValues = new Set(
-                Array.from(select.options).map(opt => opt.value)
-            );
+            try {
+                const res = await fetch(`${DATA_BASE}/labs.json`);
+                if (res.ok) {
+                    const labs = await res.json();
 
-            labs.forEach(lab => {
-                if (!existingValues.has(String(lab.id))) {
-                    const opt = document.createElement('option');
-                    opt.value = lab.id;
-                    opt.textContent = lab.name;
-                    select.appendChild(opt);
+                    const existingValues = new Set(
+                        Array.from(select.options).map(opt => opt.value)
+                    );
+
+                    labs.forEach(lab => {
+                        if (!existingValues.has(String(lab.id))) {
+                            const opt = document.createElement('option');
+                            opt.value = lab.id;
+                            opt.textContent = lab.name;
+                            select.appendChild(opt);
+                        }
+                    });
                 }
-            });
+            } catch (e) {
+                console.warn('labs.json could not be loaded, using existing dropdown options.');
+            }
 
             const params = new URLSearchParams(window.location.search);
             const queryLabId = params.get('labId');
@@ -49,8 +55,8 @@
                 loadSeats();
             }
         } catch (err) {
-            showError('Failed to load labs.');
             console.error(err);
+            showError('Failed to load labs.');
         }
     });
 
@@ -100,36 +106,16 @@
             currentLabName = selectedOption ? selectedOption.textContent : `Lab ${labId}`;
             labName.textContent = `${currentLabName} — Seat Map`;
 
-            const mergedSeats = applyBookingStateToSeats(seats, labId);
-
             if (currentLabName.trim().toUpperCase().includes('LG02')) {
-                buildLG02Layout(container, mergedSeats);
+                buildLG02Layout(container, seats);
             } else {
-                buildGenericLayout(container, mergedSeats);
+                buildGenericLayout(container, seats);
             }
         } catch (err) {
             console.error(err);
             showError('Failed to load seats for this lab.');
         }
     };
-
-    function applyBookingStateToSeats(seats, labId) {
-        const bookings = getStoredBookings();
-        const today = todayString();
-
-        return seats.map(seat => {
-            const found = bookings.find(b =>
-                String(b.labId) === String(labId) &&
-                b.seatLabel === seat.seatLabel &&
-                b.date === today
-            );
-
-            if (found) {
-                return { ...seat, status: 'in-use' };
-            }
-            return seat;
-        });
-    }
 
     function buildLG02Layout(container, seats) {
         const seatMap = {};
@@ -152,14 +138,14 @@
 
         const center = document.createElement('div');
         center.className = 'center-rows';
-        center.appendChild(makeSeatRow(['PC-01','PC-02','PC-03','PC-04','PC-05'], seatMap, 'down'));
+        center.appendChild(makeSeatRow(['PC-01', 'PC-02', 'PC-03', 'PC-04', 'PC-05'], seatMap, 'down'));
 
         const backToBack = document.createElement('div');
         backToBack.className = 'back-to-back';
-        backToBack.appendChild(makeSeatRow(['PC-06','PC-07','PC-08','PC-09','PC-10'], seatMap, 'down'));
-        backToBack.appendChild(makeSeatRow(['PC-11','PC-12','PC-13','PC-14','PC-15'], seatMap, 'up'));
+        backToBack.appendChild(makeSeatRow(['PC-06', 'PC-07', 'PC-08', 'PC-09', 'PC-10'], seatMap, 'down'));
+        backToBack.appendChild(makeSeatRow(['PC-11', 'PC-12', 'PC-13', 'PC-14', 'PC-15'], seatMap, 'up'));
         center.appendChild(backToBack);
-        center.appendChild(makeSeatRow(['PC-16','PC-17','PC-18','PC-19','PC-20'], seatMap, 'down'));
+        center.appendChild(makeSeatRow(['PC-16', 'PC-17', 'PC-18', 'PC-19', 'PC-20'], seatMap, 'down'));
         inner.appendChild(center);
 
         const rightWalk = document.createElement('div');
@@ -168,7 +154,7 @@
 
         const wallCol = document.createElement('div');
         wallCol.className = 'wall-col';
-        ['PC-28','PC-29','PC-30','PC-31','PC-32','PC-33','PC-34','PC-35','PC-36'].forEach(label => {
+        ['PC-28', 'PC-29', 'PC-30', 'PC-31', 'PC-32', 'PC-33', 'PC-34', 'PC-35', 'PC-36'].forEach(label => {
             wallCol.appendChild(createWallSeat(seatMap[label] || { seatLabel: label, status: 'available' }));
         });
         inner.appendChild(wallCol);
@@ -176,7 +162,7 @@
 
         const bottomRow = document.createElement('div');
         bottomRow.className = 'bottom-row';
-        ['PC-21','PC-22','PC-23','PC-24','PC-25','PC-26','PC-27'].forEach(label => {
+        ['PC-21', 'PC-22', 'PC-23', 'PC-24', 'PC-25', 'PC-26', 'PC-27'].forEach(label => {
             bottomRow.appendChild(createSeat(seatMap[label] || { seatLabel: label, status: 'available' }, 'down'));
         });
         labBox.appendChild(bottomRow);
@@ -240,8 +226,8 @@
         label.textContent = seat.seatLabel.replace('PC-', '');
         label.style.display = 'inline-block';
 
-        if (direction === 'down')  label.style.transform = 'rotate(180deg)';
-        if (direction === 'left')  label.style.transform = 'rotate(90deg)';
+        if (direction === 'down') label.style.transform = 'rotate(180deg)';
+        if (direction === 'left') label.style.transform = 'rotate(90deg)';
         if (direction === 'right') label.style.transform = 'rotate(-90deg)';
 
         const tooltip = document.createElement('div');
@@ -414,21 +400,10 @@
         const select = document.getElementById('bookingSlotSelect');
         select.innerHTML = '<option value="">-- Select a time slot --</option>';
 
-        const bookings = getStoredBookings();
-        const today = todayString();
-
-        const seatBookings = bookings.filter(b =>
-            String(b.labId) === String(currentLabId) &&
-            b.seatLabel === seat.seatLabel &&
-            b.date === today
-        );
-
         availableSlots.forEach(slot => {
-            const taken = seatBookings.some(b => String(b.slotId) === String(slot.id));
             const opt = document.createElement('option');
             opt.value = slot.id;
-            opt.textContent = taken ? `${slot.label} (Booked)` : slot.label;
-            opt.disabled = taken;
+            opt.textContent = slot.label;
             select.appendChild(opt);
         });
 
@@ -437,7 +412,10 @@
     }
 
     function closeBookingModal() {
-        document.getElementById('seatBookingModal').style.display = 'none';
+        const modal = document.getElementById('seatBookingModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
         currentSelectedSeat = null;
         hideBookingMsg();
     }
@@ -459,47 +437,25 @@
             return;
         }
 
-        const bookings = getStoredBookings();
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `${ctx}/student/booking`;
 
-        const alreadyTaken = bookings.some(b =>
-            String(b.labId) === String(currentLabId) &&
-            b.seatLabel === currentSelectedSeat.seatLabel &&
-            b.date === todayString() &&
-            String(b.slotId) === String(slotId)
-        );
+        form.appendChild(createHiddenInput('labId', currentLabId));
+        form.appendChild(createHiddenInput('seatId', currentSelectedSeat.id));
+        form.appendChild(createHiddenInput('bookingDate', todayString()));
+        form.appendChild(createHiddenInput('startHour', slot.startHour));
 
-        if (alreadyTaken) {
-            showBookingMsg('That PC is already booked for that slot.', '#dc2626');
-            return;
-        }
-
-        const booking = {
-            id: Date.now(),
-            labId: String(currentLabId),
-            labName: currentLabName,
-            seatId: currentSelectedSeat.id,
-            seatLabel: currentSelectedSeat.seatLabel,
-            slotId: slot.id,
-            slotLabel: slot.label,
-            date: todayString(),
-            status: 'CONFIRMED',
-            createdAt: new Date().toISOString()
-        };
-
-        bookings.push(booking);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-
-        closeBookingModal();
-        loadSeats();
-        alert(`Booked ${booking.seatLabel} for ${booking.slotLabel}`);
+        document.body.appendChild(form);
+        form.submit();
     }
 
-    function getStoredBookings() {
-        try {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        } catch (e) {
-            return [];
-        }
+    function createHiddenInput(name, value) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        return input;
     }
 
     function todayString() {
@@ -519,12 +475,15 @@
 
     function hideBookingMsg() {
         const box = document.getElementById('bookingMsg');
+        if (!box) return;
         box.style.display = 'none';
         box.textContent = '';
     }
 
     function showError(msg) {
         const container = document.getElementById('seat-map-container');
-        if (container) container.innerHTML = `<p class="error-text">${msg}</p>`;
+        if (container) {
+            container.innerHTML = `<p class="error-text">${msg}</p>`;
+        }
     }
 })();

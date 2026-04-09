@@ -33,7 +33,11 @@ public class BookingServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Long studentId = getStudentId(req);
-        if (studentId == null) { resp.sendRedirect(req.getContextPath() + "/index.html"); return; }
+        // Redirect to login instead of missing index.html
+        if (studentId == null) {
+            resp.sendRedirect(req.getContextPath() + "/pages/student/login.jsp");
+            return;
+        }
 
         String labIdParam = req.getParameter("labId");
         if (labIdParam == null || labIdParam.isBlank()) {
@@ -63,7 +67,11 @@ public class BookingServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Long studentId = getStudentId(req);
-        if (studentId == null) { resp.sendRedirect(req.getContextPath() + "/index.html"); return; }
+        // Redirect to login instead of missing index.html
+        if (studentId == null) {
+            resp.sendRedirect(req.getContextPath() + "/pages/student/login.jsp");
+            return;
+        }
 
         long   labId   = Long.parseLong(req.getParameter("labId"));
         long   seatId  = Long.parseLong(req.getParameter("seatId"));
@@ -76,20 +84,22 @@ public class BookingServlet extends HttpServlet {
         try {
             Booking booking = bookingService.bookSeat(studentId, seatId, start, end);
 
-            // PRG — flash + redirect prevents form resubmission on browser refresh
+            // PRG — flash message then redirect to My Bookings
             req.getSession().setAttribute("flash",
-                    "Booking confirmed! Your seat " +
-                    booking.getSeat().getSeatNumber() + " is reserved.");
+                    "✅ Booking confirmed! Seat " +
+                    booking.getSeat().getSeatNumber() + " is reserved from " +
+                    start.toLocalTime() + " – " + end.toLocalTime() + ".");
+
             resp.sendRedirect(req.getContextPath() + "/student/mybookings");
 
         } catch (Exception e) {
             Throwable cause = (e instanceof EJBException) ? e.getCause() : e;
 
             String errorCode;
-            if      (cause instanceof SecurityException)          errorCode = "USER_BANNED";
-            else if (cause instanceof OptimisticLockException)    errorCode = "SEAT_TAKEN";
+            if      (cause instanceof SecurityException)       errorCode = "USER_BANNED";
+            else if (cause instanceof OptimisticLockException) errorCode = "SEAT_TAKEN";
             else if ("SEAT_TAKEN".equals(cause != null ? cause.getMessage() : "")) errorCode = "SEAT_TAKEN";
-            else                                                   errorCode = "BOOKING_FAILED";
+            else                                               errorCode = "BOOKING_FAILED";
 
             try {
                 LabDTO lab = dashboardService.getLabWithSeats(labId);

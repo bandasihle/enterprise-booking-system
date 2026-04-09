@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.Response;
 public class AuthResource {
 
     @Inject
-    private AuthService authService;
+    public AuthService authService;
 
     // --- Updated Data Records ---
     public record RegisterInitRequest(String email, String studentNo) {}
