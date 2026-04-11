@@ -125,6 +125,7 @@
   <a href="#">Privacy Policy</a>
   <a href="#">Support</a>
 </footer>
+
 <script>
   function tpw(id, btn) {
     const el = document.getElementById(id);
@@ -147,7 +148,7 @@
   document.getElementById('email').addEventListener('input', function(){ if(isEmail(this.value)) setErr('email','email-err',false); });
   document.getElementById('pw').addEventListener('input',    function(){ if(this.value) setErr('pw','pw-err',false); });
 
-  async function doLogin() {
+  function doLogin() {
     const email = document.getElementById('email').value.trim();
     const pw    = document.getElementById('pw').value;
     let ok = true;
@@ -158,33 +159,19 @@
     const btn = document.getElementById('loginBtn');
     btn.disabled = true; btn.textContent = 'Signing in…';
 
-    try {
-      const response = await fetch('/EnterpriseBookingSystem/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, password: pw })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Save the JWT Session token
-        localStorage.setItem('jwt_token', data.token);
-        
+    /* ── Replace with fetch('/EnterpriseBookingSystem/LoginServlet', ...) when backend is ready ── */
+    setTimeout(() => {
+      const users = JSON.parse(localStorage.getItem('ebs_users') || '[]');
+      const match = users.find(u => u.email === email && u.password === pw && u.role === 'lecturer');
+      if (match) {
         showToast('✅ Login successful! Redirecting…', 'ok');
-        
-        // Redirect to the Lecturer Dashboard
-        setTimeout(() => {
-          window.location.href = '/EnterpriseBookingSystem/lecturer/dashboard';
-        }, 1200);
+        setTimeout(() => window.location.href = '../../test-index.html', 1200);
       } else {
-        showToast('❌ ' + data.error, 'err');
+        showToast('❌ Incorrect email or password.', 'err');
         btn.disabled = false; btn.textContent = 'Sign In as Lecturer';
       }
-    } catch (error) {
-      showToast('❌ Network error. Is GlassFish running?', 'err');
-      btn.disabled = false; btn.textContent = 'Sign In as Lecturer';
-    }
+    }, 700);
+    /* ── End demo block ── */
   }
 
   document.addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });

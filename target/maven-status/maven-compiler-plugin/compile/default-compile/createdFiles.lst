@@ -19,6 +19,7 @@ com\ebs\service\AuthService.class
 com\ebs\util\EmailService$1.class
 com\ebs\servlet\MyBookingsServlet.class
 com\ebs\servlet\DashboardServlet.class
+com\ebs\servlet\LoginServlet.class
 com\ebs\util\EmailService.class
 com\ebs\dto\LabDTO.class
 com\ebs\servlet\BookingServlet.class

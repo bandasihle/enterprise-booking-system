@@ -9,6 +9,48 @@
     <title>EBS | Book a Seat</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+  /* ── Sticky navbar ─────────────────────────────────── */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #ffffff;
+    border-bottom: 6px solid #e2e8f0;
+    box-shadow: 0 1px 10px rgba(0,0,0,0.06);
+  }
+
+  /* ── Nav links ─────────────────────────────────────── */
+  .navbar .nav-links a {
+    color: #334155;
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .navbar .nav-links a:hover {
+    background: #eff6ff;
+    color: #2563eb;
+  }
+
+  .navbar .nav-links a.active {
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-weight: 600;
+  }
+
+  /* ── Logo text ─────────────────────────────────────── */
+  .navbar .logo span {
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 18px;
+  }
+</style>
+
 </head>
 <body>
 
@@ -262,6 +304,9 @@
 
         ws.onerror = () => ws.close();
     })();
+    
+    
+    
 </script>
 
 </body>

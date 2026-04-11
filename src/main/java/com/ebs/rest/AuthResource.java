@@ -1,5 +1,8 @@
 package com.ebs.rest;
 
+import com.ebs.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Context;
 import com.ebs.service.AuthService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -10,9 +13,13 @@ import jakarta.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AuthResource {
+    
+   // Add this near the top of your class with your other injections
+    @Context
+    private HttpServletRequest httpRequest;
 
     @Inject
-    private AuthService authService;
+    public AuthService authService;
 
     // --- Updated Data Records ---
     public record RegisterInitRequest(String email, String studentNo) {}
@@ -56,11 +63,24 @@ public class AuthResource {
      * POST /api/auth/login
      * Single-step login. Returns JWT immediately.
      */
-    @POST
+   @POST
     @Path("/login")
     public Response login(LoginRequest request) {
         try {
             String jwtToken = authService.login(request.email(), request.password());
+            
+            // --- THE UPDATED SESSION BRIDGE ---
+            // 1. Fetch the full User/Student object from your database.
+            // (Note: Change 'getUserByEmail' to whatever method your AuthService actually uses!)
+            User loggedInUser = authService.getUserByEmail(request.email()); 
+            
+            httpRequest.getSession(true).setAttribute("user", loggedInUser);
+            httpRequest.getSession(true).setAttribute("userId", loggedInUser.getId());
+            
+            // 2. Save the ENTIRE object into the session under the name "user"
+            httpRequest.getSession(true).setAttribute("user", loggedInUser);
+            // ----------------------------------
+
             return Response.ok("{\"token\": \"" + jwtToken + "\", \"message\": \"Login successful.\"}").build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED)
