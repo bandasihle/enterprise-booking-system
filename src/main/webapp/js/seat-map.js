@@ -101,8 +101,18 @@
                 throw new Error(`Could not load ${fileName}`);
             }
 
-            const seats = await res.json();
-            const selectedOption = document.getElementById('labSelect').selectedOptions[0];
+const seats = await res.json();
+
+//  Fetch booked seats from backend
+const statusRes = await fetch(`${ctx}/api/seats/status?labId=${labId}`);
+const bookedSeatIds = await statusRes.json();
+
+// Override seat status from DB
+seats.forEach(seat => {
+    if (bookedSeatIds.includes(seat.id)) {
+        seat.status = 'in-use';
+    }
+});            const selectedOption = document.getElementById('labSelect').selectedOptions[0];
             currentLabName = selectedOption ? selectedOption.textContent : `Lab ${labId}`;
             labName.textContent = `${currentLabName} — Seat Map`;
 
@@ -294,14 +304,19 @@
         return div;
     }
 
-    function normalizeStatus(status) {
-        if (!status) return 'available';
-        const s = status.toLowerCase().replace(/[\s_]/g, '-');
-        if (s === 'in-use' || s === 'occupied' || s === 'booked') return 'in-use';
-        if (s === 'unavailable' || s === 'broken' || s === 'maintenance') return 'unavailable';
-        return 'available';
-    }
+function normalizeStatus(status) {
+    if (!status) return 'available';
 
+    const s = status.toLowerCase().replace(/[\s_]/g, '-');
+
+    // 🔥 ADD THIS LINE
+    if (s === 'no-show') return 'in-use';
+
+    if (s === 'in-use' || s === 'occupied' || s === 'booked') return 'in-use';
+    if (s === 'unavailable' || s === 'broken' || s === 'maintenance') return 'unavailable';
+
+    return 'available';
+}
     function ensureModal() {
         if (document.getElementById('seatBookingModal')) return;
 
