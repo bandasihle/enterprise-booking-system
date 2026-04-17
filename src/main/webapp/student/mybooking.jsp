@@ -13,7 +13,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #f8fafc; color: #1e293b; font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; }
 
-        /* ── Navbar ── */
         .navbar { position: sticky; top: 0; z-index: 1000; background: #ffffff; border-bottom: 1px solid #e2e8f0; box-shadow: 0 1px 8px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 60px; }
         .navbar .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .navbar .logo img { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; }
@@ -23,33 +22,28 @@
         .navbar .nav-links a:hover { background: #eff6ff; color: #2563eb; }
         .navbar .nav-links a.active { background: #dbeafe; color: #1d4ed8; font-weight: 600; }
 
-        /* ── Container ── */
         .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
         .page-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; }
         .page-title { font-size: 26px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
         .page-sub { font-size: 14px; color: #64748b; margin-bottom: 24px; }
 
-        /* ── Flash / Alert ── */
         .alert { padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
         .alert-success { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
         .alert-error   { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
 
-        /* ── Stats row ── */
         .stats-row { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
         .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 20px; flex: 1; min-width: 120px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
         .stat-card .stat-num { font-size: 28px; font-weight: 700; color: #1e293b; }
         .stat-card .stat-lbl { font-size: 12px; color: #64748b; font-weight: 500; margin-top: 2px; }
         .stat-card.upcoming .stat-num { color: #2563eb; }
-        .stat-card.past     .stat-num { color: #64748b; }
+        .stat-card.past .stat-num { color: #64748b; }
         .stat-card.cancelled .stat-num { color: #dc2626; }
 
-        /* ── Tabs ── */
         .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; }
         .tab { padding: 11px 20px; background: none; border: none; border-bottom: 2px solid transparent; font-size: 14px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.15s; margin-bottom: -1px; }
         .tab:hover { color: #2563eb; }
         .tab.active { color: #2563eb; border-bottom-color: #2563eb; }
 
-        /* ── Booking cards ── */
         .bookings-grid { display: grid; gap: 14px; }
         .booking-card { background: #fff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 18px 22px; display: flex; align-items: center; gap: 18px; transition: transform 0.15s, box-shadow 0.15s; }
         .booking-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
@@ -63,29 +57,23 @@
         .booking-meta { font-size: 13px; color: #64748b; display: flex; gap: 14px; flex-wrap: wrap; }
         .booking-meta span { display: flex; align-items: center; gap: 5px; }
 
-        /* ── Status badges ── */
         .booking-status { padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; flex-shrink: 0; }
         .status-upcoming  { background: #dbeafe; color: #1d4ed8; }
         .status-completed { background: #f1f5f9; color: #64748b; }
         .status-cancelled { background: #fef2f2; color: #dc2626; }
         .status-no_show   { background: #fef3c7; color: #b45309; }
 
-        /* ── Action buttons ── */
         .booking-actions { display: flex; gap: 8px; flex-shrink: 0; }
         .btn-action { padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
         .btn-cancel { background: #fef2f2; color: #dc2626; }
         .btn-cancel:hover { background: #fee2e2; }
 
-        /* ── Empty state ── */
         .empty-state { text-align: center; padding: 56px 20px; color: #94a3b8; }
         .empty-state i { font-size: 56px; margin-bottom: 14px; display: block; color: #cbd5e1; }
         .empty-state h3 { font-size: 18px; font-weight: 600; color: #475569; margin-bottom: 8px; }
         .empty-state p { font-size: 14px; margin-bottom: 20px; }
         .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; background: #2563eb; color: #fff; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.15s; }
         .btn-primary:hover { background: #1d4ed8; }
-
-        /* ── Error state ── */
-        .error-state { text-align: center; padding: 40px; color: #dc2626; }
 
         @media (max-width: 640px) {
             .booking-card { flex-direction: column; align-items: flex-start; }
@@ -121,21 +109,18 @@
         </a>
     </div>
 
-    <%-- Flash message --%>
     <c:if test="${not empty flash}">
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i> ${flash}
         </div>
     </c:if>
 
-    <%-- Load error --%>
     <c:if test="${loadError}">
         <div class="alert alert-error">
             <i class="fas fa-exclamation-circle"></i> Could not load your bookings. Please refresh the page.
         </div>
     </c:if>
 
-    <%-- Stats row --%>
     <div class="stats-row">
         <div class="stat-card upcoming">
             <div class="stat-num">${fn:length(upcomingBookings)}</div>
@@ -155,20 +140,12 @@
         </div>
     </div>
 
-    <%-- Tabs --%>
     <div class="tabs">
-        <button class="tab active" onclick="showTab('upcoming', this)">
-            Upcoming <c:if test="${fn:length(upcomingBookings) > 0}">(${fn:length(upcomingBookings)})</c:if>
-        </button>
-        <button class="tab" onclick="showTab('past', this)">
-            Past <c:if test="${fn:length(pastBookings) > 0}">(${fn:length(pastBookings)})</c:if>
-        </button>
-        <button class="tab" onclick="showTab('cancelled', this)">
-            Cancelled <c:if test="${fn:length(cancelledBookings) > 0}">(${fn:length(cancelledBookings)})</c:if>
-        </button>
+        <button class="tab active" onclick="showTab('upcoming', this)">Upcoming</button>
+        <button class="tab" onclick="showTab('past', this)">Past</button>
+        <button class="tab" onclick="showTab('cancelled', this)">Cancelled</button>
     </div>
 
-    <%-- ══ UPCOMING TAB ══ --%>
     <div id="tab-upcoming" class="bookings-grid">
         <c:choose>
             <c:when test="${empty upcomingBookings}">
@@ -186,24 +163,24 @@
                     <div class="booking-card">
                         <div class="booking-icon"><i class="fas fa-desktop"></i></div>
                         <div class="booking-details">
-                            <div class="booking-id">${b.displayId}</div>
+                            <div class="booking-id">Booking #${b.id}</div>
                             <div class="booking-title">
                                 ${b.seatNumber}
                                 <span style="color:#64748b;font-weight:500;"> — ${b.labName}</span>
                             </div>
                             <div class="booking-meta">
                                 <span><i class="fas fa-map-marker-alt"></i> ${b.building}</span>
-                                <span><i class="fas fa-calendar"></i> ${b.formattedDate}</span>
-                                <span><i class="fas fa-clock"></i> ${b.formattedTimeRange}</span>
+                                <span><i class="fas fa-calendar"></i> ${b.startTime}</span>
+                                <span><i class="fas fa-clock"></i> ${b.startTime} - ${b.endTime}</span>
                             </div>
                         </div>
-                        <span class="booking-status status-upcoming">Upcoming</span>
+                        <span class="booking-status status-upcoming">${b.status}</span>
                         <div class="booking-actions">
                             <form method="POST" action="${pageContext.request.contextPath}/student/mybookings">
-                                <input type="hidden" name="action"    value="cancel">
+                                <input type="hidden" name="action" value="cancel">
                                 <input type="hidden" name="bookingId" value="${b.id}">
                                 <button type="submit" class="btn-action btn-cancel"
-                                        onclick="return confirm('Cancel booking ${b.displayId}?')">
+                                        onclick="return confirm('Cancel booking #${b.id}?')">
                                     <i class="fas fa-times"></i> Cancel
                                 </button>
                             </form>
@@ -214,7 +191,6 @@
         </c:choose>
     </div>
 
-    <%-- ══ PAST TAB ══ --%>
     <div id="tab-past" class="bookings-grid" style="display:none;">
         <c:choose>
             <c:when test="${empty pastBookings}">
@@ -231,15 +207,15 @@
                             <i class="fas fa-desktop"></i>
                         </div>
                         <div class="booking-details">
-                            <div class="booking-id">${b.displayId}</div>
+                            <div class="booking-id">Booking #${b.id}</div>
                             <div class="booking-title">
                                 ${b.seatNumber}
                                 <span style="color:#64748b;font-weight:500;"> — ${b.labName}</span>
                             </div>
                             <div class="booking-meta">
                                 <span><i class="fas fa-map-marker-alt"></i> ${b.building}</span>
-                                <span><i class="fas fa-calendar"></i> ${b.formattedDate}</span>
-                                <span><i class="fas fa-clock"></i> ${b.formattedTimeRange}</span>
+                                <span><i class="fas fa-calendar"></i> ${b.startTime}</span>
+                                <span><i class="fas fa-clock"></i> ${b.startTime} - ${b.endTime}</span>
                             </div>
                         </div>
                         <span class="booking-status status-completed">${b.status}</span>
@@ -249,7 +225,6 @@
         </c:choose>
     </div>
 
-    <%-- ══ CANCELLED TAB ══ --%>
     <div id="tab-cancelled" class="bookings-grid" style="display:none;">
         <c:choose>
             <c:when test="${empty cancelledBookings}">
@@ -266,18 +241,18 @@
                             <i class="fas fa-desktop"></i>
                         </div>
                         <div class="booking-details">
-                            <div class="booking-id">${b.displayId}</div>
+                            <div class="booking-id">Booking #${b.id}</div>
                             <div class="booking-title">
                                 ${b.seatNumber}
                                 <span style="color:#64748b;font-weight:500;"> — ${b.labName}</span>
                             </div>
                             <div class="booking-meta">
                                 <span><i class="fas fa-map-marker-alt"></i> ${b.building}</span>
-                                <span><i class="fas fa-calendar"></i> ${b.formattedDate}</span>
-                                <span><i class="fas fa-clock"></i> ${b.formattedTimeRange}</span>
+                                <span><i class="fas fa-calendar"></i> ${b.startTime}</span>
+                                <span><i class="fas fa-clock"></i> ${b.startTime} - ${b.endTime}</span>
                             </div>
                         </div>
-                        <span class="booking-status status-cancelled">Cancelled</span>
+                        <span class="booking-status status-cancelled">${b.status}</span>
                     </div>
                 </c:forEach>
             </c:otherwise>
@@ -288,13 +263,18 @@
 
 <script>
     function showTab(name, btn) {
-        ['upcoming','past','cancelled'].forEach(t => {
-            document.getElementById('tab-' + t).style.display = 'none';
+        ['upcoming', 'past', 'cancelled'].forEach(function(tab) {
+            document.getElementById('tab-' + tab).style.display = 'none';
         });
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+        document.querySelectorAll('.tab').forEach(function(tabBtn) {
+            tabBtn.classList.remove('active');
+        });
+
         document.getElementById('tab-' + name).style.display = 'grid';
         btn.classList.add('active');
     }
 </script>
+
 </body>
 </html>

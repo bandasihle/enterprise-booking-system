@@ -189,7 +189,7 @@
 </a>
     <div class="nav-links">
         <a href="${pageContext.request.contextPath}/student/dashboard" class="active">Dashboard</a>
-        <a href="${pageContext.request.contextPath}/student/mybooking.jsp">My Bookings</a>
+        <a href="${pageContext.request.contextPath}/student/mybookings">My Bookings</a>
     </div>
 </nav>
 

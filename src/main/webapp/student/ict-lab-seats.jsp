@@ -88,7 +88,7 @@
     <div class="nav-links">
         <a href="${pageContext.request.contextPath}/student/dashboard.jsp">Dashboard</a>
         <a href="${pageContext.request.contextPath}/student/ict-lab-seats.jsp" class="active">Book PC</a>
-        <a href="${pageContext.request.contextPath}/student/mybooking.jsp">My Bookings</a>
+        <a href="${pageContext.request.contextPath}/student/mybookings">My Bookings</a>
     </div>
 </nav>
 

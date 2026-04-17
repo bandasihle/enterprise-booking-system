@@ -17,16 +17,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * GET  /student/mybookings              — loads bookings from DB, splits into
- *                                         upcoming / past / cancelled, forwards to mybooking.jsp
- * POST /student/mybookings?action=cancel — cancels a booking; PRG on success
- */
 @WebServlet("/student/mybookings")
 public class MyBookingsServlet extends HttpServlet {
 
-    @EJB private StudentDashboardService dashboardService;
-    @EJB private BookingService          bookingService;
+    @EJB
+    private StudentDashboardService dashboardService;
+
+    @EJB
+    private BookingService bookingService;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -40,37 +38,46 @@ public class MyBookingsServlet extends HttpServlet {
 
         try {
             List<BookingDTO> all = dashboardService.getStudentBookings(studentId);
-            LocalDateTime now   = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now();
 
-            // Split into three lists for the three tabs
             List<BookingDTO> upcoming = all.stream()
-                    .filter(b -> "CONFIRMED".equals(b.getStatus()) && b.getStartTime().isAfter(now))
+                    .filter(b ->
+                            "CONFIRMED".equalsIgnoreCase(b.getStatus()) &&
+                            b.getStartTime() != null &&
+                            b.getStartTime().isAfter(now))
                     .collect(Collectors.toList());
 
             List<BookingDTO> past = all.stream()
-                    .filter(b -> ("CONFIRMED".equals(b.getStatus()) || "COMPLETED".equals(b.getStatus())
-                                  || "NO_SHOW".equals(b.getStatus()))
-                              && !b.getStartTime().isAfter(now))
+                    .filter(b ->
+                            ("CONFIRMED".equalsIgnoreCase(b.getStatus())
+                             || "COMPLETED".equalsIgnoreCase(b.getStatus())
+                             || "NO_SHOW".equalsIgnoreCase(b.getStatus()))
+                            && b.getStartTime() != null
+                            && !b.getStartTime().isAfter(now))
                     .collect(Collectors.toList());
 
             List<BookingDTO> cancelled = all.stream()
-                    .filter(b -> "CANCELLED".equals(b.getStatus()))
+                    .filter(b -> "CANCELLED".equalsIgnoreCase(b.getStatus()))
                     .collect(Collectors.toList());
 
-            req.setAttribute("upcomingBookings",  upcoming);
-            req.setAttribute("pastBookings",      past);
+            req.setAttribute("bookings", all);
+            req.setAttribute("upcomingBookings", upcoming);
+            req.setAttribute("pastBookings", past);
             req.setAttribute("cancelledBookings", cancelled);
-            req.setAttribute("totalBookings",     all.size());
+            req.setAttribute("totalBookings", all.size());
 
         } catch (Exception e) {
             req.setAttribute("loadError", true);
+            e.printStackTrace();
         }
 
-        // Flash message from previous redirect
         HttpSession session = req.getSession(false);
         if (session != null) {
-            req.setAttribute("flash", session.getAttribute("flash"));
-            session.removeAttribute("flash");
+            Object flash = session.getAttribute("flash");
+            if (flash != null) {
+                req.setAttribute("flash", flash);
+                session.removeAttribute("flash");
+            }
         }
 
         req.getRequestDispatcher("/student/mybooking.jsp").forward(req, resp);
@@ -86,34 +93,44 @@ public class MyBookingsServlet extends HttpServlet {
             return;
         }
 
-        if ("cancel".equals(req.getParameter("action"))) {
+        String action = req.getParameter("action");
+
+        if ("cancel".equalsIgnoreCase(action)) {
             try {
                 Long bookingId = Long.parseLong(req.getParameter("bookingId"));
                 bookingService.cancelBooking(bookingId);
+
                 req.getSession().setAttribute("flash", "Booking cancelled successfully.");
                 resp.sendRedirect(req.getContextPath() + "/student/mybookings");
+                return;
 
             } catch (NumberFormatException e) {
                 req.getSession().setAttribute("flash", "Invalid booking ID.");
                 resp.sendRedirect(req.getContextPath() + "/student/mybookings");
+                return;
+
             } catch (EJBException e) {
                 Throwable cause = e.getCause();
                 String msg = (cause instanceof IllegalArgumentException)
                         ? "Booking not found."
                         : "Could not cancel this booking.";
+
                 req.getSession().setAttribute("flash", msg);
                 resp.sendRedirect(req.getContextPath() + "/student/mybookings");
+                return;
+
             } catch (Exception e) {
                 req.getSession().setAttribute("flash", "An unexpected error occurred.");
                 resp.sendRedirect(req.getContextPath() + "/student/mybookings");
+                return;
             }
-        } else {
-            resp.sendRedirect(req.getContextPath() + "/student/mybookings");
         }
+
+        resp.sendRedirect(req.getContextPath() + "/student/mybookings");
     }
 
     private Long getStudentId(HttpServletRequest req) {
-        HttpSession s = req.getSession(false);
-        return (s == null) ? null : (Long) s.getAttribute("userId");
+        HttpSession session = req.getSession(false);
+        return (session == null) ? null : (Long) session.getAttribute("userId");
     }
 }
