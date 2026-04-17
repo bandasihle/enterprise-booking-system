@@ -1,4 +1,4 @@
-﻿package com.ebs.websocket;
+package com.ebs.websocket;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.websocket.*;
@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 
 /**
  * WebSocket endpoint for real-time seat availability updates.
