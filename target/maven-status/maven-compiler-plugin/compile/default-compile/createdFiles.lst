@@ -1,3 +1,4 @@
+com\ebs\servlet\complaints.class
 com\ebs\entity\Seat.class
 com\ebs\entity\User.class
 com\ebs\entity\Lecturer.class

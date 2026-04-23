@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EBS | My Bookings</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/CSS/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -63,10 +63,15 @@
         .status-cancelled { background: #fef2f2; color: #dc2626; }
         .status-no_show   { background: #fef3c7; color: #b45309; }
 
-        .booking-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .booking-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
         .btn-action { padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+        
         .btn-cancel { background: #fef2f2; color: #dc2626; }
         .btn-cancel:hover { background: #fee2e2; }
+        
+        /* ── Report Button Styling ── */
+        .btn-report { background: #fffbeb; color: #d97706; }
+        .btn-report:hover { background: #fef3c7; }
 
         .empty-state { text-align: center; padding: 56px 20px; color: #94a3b8; }
         .empty-state i { font-size: 56px; margin-bottom: 14px; display: block; color: #cbd5e1; }
@@ -74,6 +79,21 @@
         .empty-state p { font-size: 14px; margin-bottom: 20px; }
         .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; background: #2563eb; color: #fff; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.15s; }
         .btn-primary:hover { background: #1d4ed8; }
+
+        /* ── Modal overlay ───────────────────────────────── */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: #fff; border-radius: 16px; padding: 28px; width: 90%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative; }
+        .modal-title { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+        .modal-sub   { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+        .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; }
+        .modal-close:hover { color: #1e293b; }
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+        .form-control { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #e2e8f0; font-size: 14px; color: #1e293b; outline: none; transition: border-color 0.15s; }
+        .form-control:focus { border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+        .btn-submit { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+        .btn-submit:hover { background: #1d4ed8; }
 
         @media (max-width: 640px) {
             .booking-card { flex-direction: column; align-items: flex-start; }
@@ -109,9 +129,17 @@
         </a>
     </div>
 
+    <%-- Flash message from Booking --%>
     <c:if test="${not empty flash}">
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i> ${flash}
+        </div>
+    </c:if>
+
+    <%-- Flash message from successful Complaint Report --%>
+    <c:if test="${param.complaint == 'success'}">
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> Your complaint has been received. Thank you!
         </div>
     </c:if>
 
@@ -176,7 +204,13 @@
                         </div>
                         <span class="booking-status status-upcoming">${b.status}</span>
                         <div class="booking-actions">
-                            <form method="POST" action="${pageContext.request.contextPath}/student/mybookings">
+                            
+                            <%-- The New Report Issue Button --%>
+                            <button type="button" class="btn-action btn-report" onclick="openComplaintModal('${b.id}', '${b.labName}', '${b.seatNumber}')">
+                                <i class="fas fa-exclamation-triangle"></i> Report Issue
+                            </button>
+
+                            <form method="POST" action="${pageContext.request.contextPath}/student/mybookings" style="margin: 0;">
                                 <input type="hidden" name="action" value="cancel">
                                 <input type="hidden" name="bookingId" value="${b.id}">
                                 <button type="submit" class="btn-action btn-cancel"
@@ -261,6 +295,39 @@
 
 </div>
 
+<div class="modal-overlay" id="complaintModal" onclick="closeComplaintModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+        <button class="modal-close" type="button" onclick="document.getElementById('complaintModal').classList.remove('open')">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-title">Report an Issue</div>
+        <div class="modal-sub" id="complaintContext"></div>
+        
+        <form action="${pageContext.request.contextPath}/submitComplaint" method="POST">
+            <input type="hidden" name="bookingId" id="modalBookingId">
+            
+            <div class="form-group">
+                <label>Category</label>
+                <select name="category" required class="form-control">
+                    <option value="" disabled selected>Select the problem...</option>
+                    <option value="Hardware">Hardware / Broken PC</option>
+                    <option value="Network">Network / Internet Down</option>
+                    <option value="Noise">Noise / Disturbance by others</option>
+                    <option value="Cleanliness">Cleanliness</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Details</label>
+                <textarea name="description" rows="3" required class="form-control" placeholder="Briefly describe the issue..." style="resize: none;"></textarea>
+            </div>
+            
+            <button type="submit" class="btn-submit">Submit Report</button>
+        </form>
+    </div>
+</div>
+
 <script>
     function showTab(name, btn) {
         ['upcoming', 'past', 'cancelled'].forEach(function(tab) {
@@ -273,6 +340,19 @@
 
         document.getElementById('tab-' + name).style.display = 'grid';
         btn.classList.add('active');
+    }
+
+    /* ── Modal Logic ── */
+    function openComplaintModal(bookingId, labName, seatNum) {
+        document.getElementById('modalBookingId').value = bookingId;
+        document.getElementById('complaintContext').textContent = 'For: ' + seatNum + ' in ' + labName;
+        document.getElementById('complaintModal').classList.add('open');
+    }
+
+    function closeComplaintModal(e) {
+        if (e.target === document.getElementById('complaintModal')) {
+            document.getElementById('complaintModal').classList.remove('open');
+        }
     }
 </script>
 
