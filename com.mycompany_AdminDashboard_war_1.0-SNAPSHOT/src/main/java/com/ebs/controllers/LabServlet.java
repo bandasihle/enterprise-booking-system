@@ -28,6 +28,60 @@ public class LabServlet extends HttpServlet {
      * Called every time resources.jsp loads — ensures labs
      * always reflect the real database, not hardcoded HTML.
      */
+    
+    
+    /*
+ * Deletes a lab from the database permanently.
+ * Expects JSON: { "id": "3" }
+ */
+private void handleDeleteLab(String body,
+                              HttpServletResponse response)
+        throws IOException {
+
+    String idStr = extractJsonNumber(body, "id");
+
+    System.out.println("🗑 Deleting lab ID=" + idStr);
+
+    if (idStr.isEmpty()) {
+        response.getWriter().write(
+            "{\"success\":false,\"message\":\"Lab ID is required\"}"
+        );
+        return;
+    }
+
+    try (Connection conn = DatabaseConnection.getConnection()) {
+
+        PreparedStatement ps = conn.prepareStatement(
+            "DELETE FROM labs WHERE ID = ?"
+        );
+        ps.setInt(1, Integer.parseInt(idStr.trim()));
+
+        boolean success = ps.executeUpdate() > 0;
+
+        if (success) {
+            System.out.println("✅ Lab deleted: ID=" + idStr);
+            response.getWriter().write(
+                "{\"success\":true,\"message\":\"Lab deleted successfully\"}"
+            );
+        } else {
+            response.getWriter().write(
+                "{\"success\":false,\"message\":\"Lab not found\"}"
+            );
+        }
+
+    } catch (Exception e) {
+        System.out.println("❌ Delete lab error: " + e.getMessage());
+        e.printStackTrace();
+        response.getWriter().write(
+            "{\"success\":false,\"message\":\"" + e.getMessage() + "\"}"
+        );
+    }
+}
+    
+    
+    
+    
+    
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response)
@@ -105,14 +159,16 @@ public class LabServlet extends HttpServlet {
         System.out.println("📥 LabsServlet [" + path + "] body: " + body);
 
         if ("/add".equals(path)) {
-            handleAddLab(body, response);
-        } else if ("/update".equals(path)) {
-            handleUpdateLab(body, response);
-        } else {
-            response.getWriter().write(
-                "{\"success\":false,\"message\":\"Unknown action: " + path + "\"}"
-            );
-        }
+    handleAddLab(body, response);
+} else if ("/update".equals(path)) {
+    handleUpdateLab(body, response);
+} else if ("/delete".equals(path)) {
+    handleDeleteLab(body, response);  // ← ADD THIS
+} else {
+    response.getWriter().write(
+        "{\"success\":false,\"message\":\"Unknown action: " + path + "\"}"
+    );
+}
     }
 
     /*

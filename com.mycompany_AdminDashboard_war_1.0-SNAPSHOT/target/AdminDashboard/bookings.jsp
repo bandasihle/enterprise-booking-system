@@ -71,7 +71,7 @@
     <section class="panel">
       <div class="panel-header">
         <h2>Booking Records</h2>
-        <button class="panel-btn">Export</button>
+        
       </div>
       <div class="table-wrapper">
         <table>
