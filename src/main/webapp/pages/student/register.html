@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Register – Enterprise Booking System</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="../../css/styles.css"/>
   <style>
     body { display: flex; flex-direction: column; }
@@ -25,7 +26,7 @@
     .left-panel h2  { color: white; }
     .left-panel > p { color: rgba(255,255,255,0.75); }
     .left-panel .feat-list li { color: rgba(255,255,255,0.9); }
-    .left-panel .feat-ico { background: rgba(255,255,255,0.15); }
+    .left-panel .feat-ico { background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; }
     .left-panel .dc { border: 1px solid rgba(255,255,255,0.1); }
 
     .right-panel { background: var(--bg); }
@@ -47,7 +48,7 @@
     .pline { flex:1; height:2px; background:var(--border); margin:0 8px; border-radius:2px; transition:background 0.3s; }
     .pline.done { background: var(--success); }
 
-    /* Role chip — only Student shown, pre-selected */
+    /* Role chip */
     .role-display {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 10px 18px; border-radius: 10px;
@@ -97,17 +98,17 @@
     .bottom-link a { color:var(--blue); font-weight:700; text-decoration:none; }
     .bottom-link a:hover { text-decoration: underline; }
     
-  /* FOOTER – white */
-  footer {
-    background: white !important;
-    color: #666 !important;
-  }
-  footer a {
-    color: var(--blue) !important;
-  }
-  footer a:hover {
-    color: var(--blue-hover) !important;
-  }
+    /* FOOTER – white */
+    footer {
+      background: white !important;
+      color: #666 !important;
+    }
+    footer a {
+      color: var(--blue) !important;
+    }
+    footer a:hover {
+      color: var(--blue-hover) !important;
+    }
   </style>
 </head>
 <body>
@@ -142,14 +143,14 @@
     <div class="dc dc1"></div>
     <div class="dc dc2"></div>
     <div class="dc dc3"></div>
-    <span class="l-tag">🎓 Student Registration</span>
+    <span class="l-tag"><i class="fas fa-user-graduate"></i> Student Registration</span>
     <h2>Create Your<br>Student Account</h2>
     <p>Register with your Student ID, verify your email and start booking immediately.</p>
     <ul class="feat-list">
-      <li><div class="feat-ico">🪪</div> Register with Student ID</li>
-      <li><div class="feat-ico">🔒</div> Email OTP verification</li>
-      <li><div class="feat-ico">⚡</div> Instant access after signup</li>
-      <li><div class="feat-ico">📅</div> Start booking immediately</li>
+      <li><div class="feat-ico"><i class="fas fa-id-badge"></i></div> Register with Student ID</li>
+      <li><div class="feat-ico"><i class="fas fa-envelope-circle-check"></i></div> Email OTP verification</li>
+      <li><div class="feat-ico"><i class="fas fa-bolt"></i></div> Instant access after signup</li>
+      <li><div class="feat-ico"><i class="fas fa-calendar-alt"></i></div> Start booking immediately</li>
     </ul>
   </div>
 
@@ -161,7 +162,7 @@
         <div class="pline" id="pl1"></div>
         <div class="ps" id="ps2"><div class="pn">2</div><span class="pl">Verify Email</span></div>
         <div class="pline" id="pl2"></div>
-        <div class="ps" id="ps3"><div class="pn">✓</div><span class="pl">Done</span></div>
+        <div class="ps" id="ps3"><div class="pn"><i class="fas fa-check"></i></div><span class="pl">Done</span></div>
       </div>
 
       <div id="step1">
@@ -170,13 +171,13 @@
 
         <div id="toast1" class="toast"></div>
 
-        <div class="role-display">🎓 Registering as a Student</div>
+        <div class="role-display"><i class="fas fa-user-graduate"></i> Registering as a Student</div>
 
         <div class="field">
           <label for="uid">Student Number</label>
           <div class="iw">
-            <span class="ii">🪪</span>
-            <input type="text" id="uid" placeholder="e.g.201234567"/>
+            <span class="ii"><i class="fas fa-id-card"></i></span>
+            <input type="text" id="uid" placeholder="e.g. 201234567"/>
           </div>
           <div class="fmsg" id="uid-err">Student Number is required.</div>
         </div>
@@ -184,7 +185,7 @@
         <div class="field">
           <label for="email">Email Address</label>
           <div class="iw">
-            <span class="ii">✉️</span>
+            <span class="ii"><i class="fas fa-envelope"></i></span>
             <input type="email" id="email" placeholder="200000000@ump.ac.za"/>
           </div>
           <div class="fmsg" id="email-err">Please enter a valid email address.</div>
@@ -193,7 +194,7 @@
         <div class="field">
           <label for="pw">Password</label>
           <div class="iw">
-            <span class="ii">🔑</span>
+            <span class="ii"><i class="fas fa-key"></i></span>
             <input type="password" id="pw" placeholder="Minimum 8 characters" oninput="strengthCheck(this.value)"/>
             <button class="toggle-pw" type="button" onclick="tpw('pw',this)">Show</button>
           </div>
@@ -208,7 +209,7 @@
         <div class="field">
           <label for="cpw">Confirm Password</label>
           <div class="iw">
-            <span class="ii">🔒</span>
+            <span class="ii"><i class="fas fa-lock"></i></span>
             <input type="password" id="cpw" placeholder="Repeat your password" oninput="matchCheck()"/>
             <button class="toggle-pw" type="button" onclick="tpw('cpw',this)">Show</button>
           </div>
@@ -221,12 +222,12 @@
         </div>
         <div class="fmsg" id="terms-err" style="margin-bottom:10px;">You must accept the terms to continue.</div>
 
-        <button class="btn-main" id="regBtn" onclick="doRegister()">Create Account →</button>
+        <button class="btn-main" id="regBtn" onclick="doRegister()">Create Account <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></button>
         <div class="bottom-link">Already have an account? <a href="login.html">Sign in</a></div>
       </div>
 
       <div id="step2" style="display:none;">
-        <div class="form-title">Verify Your Email 📧</div>
+        <div class="form-title">Verify Your Email</div>
         <div class="form-sub">Enter the 6-digit code sent to your email</div>
         <p class="otp-email">Code sent to <strong id="otp-email-show"></strong></p>
 
@@ -242,12 +243,12 @@
         </div>
 
         <div class="otp-meta">
-          <span class="timer-txt" id="timerWrap">Resend in <b id="timerVal">30</b>s</span>
+          <span class="timer-txt" id="timerWrap">Resend in <b id="timerVal">60</b>s</span>
           <button class="resend" id="resendBtn" onclick="resend()">Resend Code</button>
         </div>
 
         <button class="btn-main" id="verifyBtn" onclick="doVerify()">Verify &amp; Continue</button>
-        <button class="btn-ghost" onclick="goBack()">← Back</button>
+        <button class="btn-ghost" onclick="goBack()"><i class="fas fa-arrow-left" style="margin-right: 5px;"></i> Back</button>
       </div>
 
     </div>
@@ -263,7 +264,7 @@
 
 <script>
   const role = 'student';
-  let timerInt = null, timerSec = 30;
+  let timerInt = null, timerSec = 60; // Set to 60 seconds
 
   function tpw(id, btn) {
     const el = document.getElementById(id);
@@ -280,7 +281,8 @@
 
   function showToast(id, msg, type) {
     const t = document.getElementById(id);
-    t.textContent = msg; t.className = 'toast ' + type;
+    t.innerHTML = msg; 
+    t.className = 'toast ' + type;
   }
 
   function strengthCheck(pw) {
@@ -329,7 +331,8 @@
   }
 
   function startTimer() {
-    timerSec = 30; clearInterval(timerInt);
+    timerSec = 60; // Start at 60 seconds
+    clearInterval(timerInt);
     const tw = document.getElementById('timerWrap');
     const rb = document.getElementById('resendBtn');
     if (tw) tw.style.display = 'block';
@@ -347,7 +350,6 @@
     }, 1000);
   }
 
-  // Adjusted resend to trigger the API again
   async function resend() {
     const email = document.getElementById('email').value.trim();
     const uid   = document.getElementById('uid').value.trim();
@@ -360,17 +362,16 @@
         body: JSON.stringify({ email: email, studentNo: uid })
       });
       if (response.ok) {
-        showToast('toast2','📨 New code sent! (Check NetBeans console)','inf');
+        showToast('toast2','New code sent to your email.','inf');
         startTimer();
       } else {
-        showToast('toast2','❌ Failed to resend code.','err');
+        showToast('toast2','Failed to resend code.','err');
       }
     } catch (error) {
-      showToast('toast2','❌ Network error.','err');
+      showToast('toast2','Network error.','err');
     }
   }
 
-  // --- NEW MYSQL CONNECTION FOR STEP 1 ---
   async function doRegister() {
     const uid   = document.getElementById('uid').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -388,10 +389,9 @@
     if (!ok) return;
 
     const btn = document.getElementById('regBtn');
-    btn.disabled = true; btn.textContent = 'Checking details…';
+    btn.disabled = true; btn.textContent = 'Checking details...';
 
     try {
-      // Hit the init endpoint to generate the OTP in MySQL and "email" it
       const response = await fetch('/EnterpriseBookingSystem/api/auth/register/init', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -399,66 +399,64 @@
       });
 
       if (response.ok) {
-        // Switch to the OTP UI
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
         document.getElementById('otp-email-show').textContent = email;
-        showToast('toast2', '📨 Code sent! (Check NetBeans console)', 'inf');
+        
+        showToast('toast2', 'Code sent to your email.', 'inf');
         setStep(2); startTimer();
         document.getElementById('o0').focus();
       } else {
         const data = await response.json();
-        showToast('toast1', '❌ ' + data.error, 'err');
+        showToast('toast1', data.error, 'err');
       }
     } catch (error) {
-      showToast('toast1', '❌ Network error. Is GlassFish running?', 'err');
+      showToast('toast1', 'Network error. Is GlassFish running?', 'err');
     }
     
-    btn.disabled = false; btn.textContent = 'Create Account →';
+    btn.disabled = false; 
+    btn.innerHTML = 'Create Account <i class="fas fa-arrow-right" style="margin-left: 5px;"></i>';
   }
 
-  // --- NEW MYSQL CONNECTION FOR STEP 2 ---
   async function doVerify() {
     const enteredOtp = [0,1,2,3,4,5].map(i => document.getElementById('o'+i).value).join('');
-    if (enteredOtp.length < 6) { showToast('toast2','⚠️ Please enter all 6 digits.','err'); return; }
+    if (enteredOtp.length < 6) { showToast('toast2','Please enter all 6 digits.','err'); return; }
 
     const uid   = document.getElementById('uid').value.trim();
     const email = document.getElementById('email').value.trim();
     const pw    = document.getElementById('pw').value;
 
     const btn = document.getElementById('verifyBtn');
-    btn.disabled = true; btn.textContent = 'Saving to Database…';
+    btn.disabled = true; btn.textContent = 'Saving to Database...';
 
     try {
-      // Hit the main register endpoint to verify OTP and save the user
       const response = await fetch('/EnterpriseBookingSystem/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           studentNo: uid,
-          fullName: "Student " + uid, // Temporary placeholder until you add a Full Name input to HTML
+          fullName: "Student " + uid, 
           email: email,
           password: pw,
-          otpCode: enteredOtp
+          otpCode: enteredOtp,
+          role: "student"
         })
       });
 
-      if (response.status === 201) { // 201 means "Created" successfully
+      if (response.status === 201) { 
         clearInterval(timerInt);
         [0,1,2,3,4,5].forEach(i => document.getElementById('o'+i).classList.add('s'));
-        showToast('toast2', '✅ Registered successfully! Redirecting…', 'ok');
+        showToast('toast2', 'Registered successfully! Redirecting...', 'ok');
         setStep(3);
-        
-        // Send them to login page
         setTimeout(() => window.location.href = 'login.html', 1500);
       } else {
         const data = await response.json();
         [0,1,2,3,4,5].forEach(i => document.getElementById('o'+i).classList.add('e'));
-        showToast('toast2', '❌ ' + data.error, 'err');
+        showToast('toast2', data.error, 'err');
         btn.disabled = false; btn.textContent = 'Verify & Continue';
       }
     } catch (error) {
-      showToast('toast2', '❌ Network error.', 'err');
+      showToast('toast2', 'Network error.', 'err');
       btn.disabled = false; btn.textContent = 'Verify & Continue';
     }
   }

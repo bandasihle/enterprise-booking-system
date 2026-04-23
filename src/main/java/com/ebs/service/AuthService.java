@@ -1,5 +1,6 @@
 package com.ebs.service;
 
+import com.ebs.entity.Lecturer;
 import com.ebs.entity.OtpToken;
 import com.ebs.entity.Student;
 import com.ebs.entity.User;
@@ -47,7 +48,7 @@ public class AuthService {
         generateAndSendOtp(email);
     }
 
-    @Transactional
+   @Transactional
     public void verifyOtpAndRegister(RegisterRequest request) throws Exception {
         try {
             OtpToken otpToken = em.createQuery(
@@ -61,13 +62,25 @@ public class AuthService {
             otpToken.setUsed(true);
             em.merge(otpToken);
 
-            Student newStudent = new Student();
-            newStudent.setFullName(request.fullName());
-            newStudent.setEmail(request.email());
-            newStudent.setPassword(request.password());
-            newStudent.setStudentNumber(request.studentNo());
-
-            em.persist(newStudent);
+            // --- THE FIX: Route the user to the correct JPA Entity based on role ---
+            if ("lecturer".equalsIgnoreCase(request.role())) {
+                Lecturer newLecturer = new Lecturer();
+                newLecturer.setFullName(request.fullName());
+                newLecturer.setEmail(request.email());
+                newLecturer.setPassword(request.password());
+                // The frontend passes the Staff ID inside the studentNo field
+                newLecturer.setStaffNumber(request.studentNo()); 
+                
+                em.persist(newLecturer); 
+            } else {
+                Student newStudent = new Student();
+                newStudent.setFullName(request.fullName());
+                newStudent.setEmail(request.email());
+                newStudent.setPassword(request.password());
+                newStudent.setStudentNumber(request.studentNo());
+                
+                em.persist(newStudent); 
+            }
 
         } catch (NoResultException e) {
             throw new Exception("Invalid or expired OTP.");
@@ -85,17 +98,19 @@ public class AuthService {
                 throw new Exception("User is banned.");
             }
 
+            // --- DEVELOPER DEBUG CHECK ---
             if (!user.getPassword().equals(password)) {
-                throw new Exception("Invalid password.");
+                throw new Exception("DEBUG: Password mismatch! Database has [" + user.getPassword() + "] but you typed [" + password + "]");
             }
 
             return "mock-jwt-token-" + System.currentTimeMillis();
 
         } catch (NoResultException e) {
-            throw new Exception("Invalid email or password.");
+            // --- DEVELOPER DEBUG CHECK ---
+            throw new Exception("DEBUG: Cannot find email [" + email + "] in the database!");
         }
     }
-
+    
     public Long loginAndReturnUserId(String email, String password) throws Exception {
         try {
             User user = em.createQuery(
