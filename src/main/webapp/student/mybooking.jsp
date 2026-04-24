@@ -67,6 +67,27 @@
         .btn-action { padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
         .btn-cancel { background: #fef2f2; color: #dc2626; }
         .btn-cancel:hover { background: #fee2e2; }
+        .btn-complaint { background: #fef3c7; color: #b45309; }
+        .btn-complaint:hover { background: #fde68a; }
+
+        /* ── COMPLAINT MODAL ── */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 24px 64px rgba(0,0,0,0.18); }
+        .modal h2 { font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+        .modal-sub { font-size: 13px; color: #64748b; margin-bottom: 22px; }
+        .modal-booking-info { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; font-size: 13px; color: #475569; }
+        .modal-booking-info strong { color: #1e293b; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: inherit; color: #1e293b; background: #fff; transition: border-color 0.15s; outline: none; }
+        .form-group select:focus, .form-group textarea:focus { border-color: #2563eb; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+        .btn-modal-cancel { padding: 9px 18px; border-radius: 9px; font-size: 14px; font-weight: 600; background: #f1f5f9; color: #64748b; border: none; cursor: pointer; }
+        .btn-modal-cancel:hover { background: #e2e8f0; }
+        .btn-modal-submit { padding: 9px 18px; border-radius: 9px; font-size: 14px; font-weight: 600; background: #2563eb; color: #fff; border: none; cursor: pointer; }
+        .btn-modal-submit:hover { background: #1d4ed8; }
 
         .empty-state { text-align: center; padding: 56px 20px; color: #94a3b8; }
         .empty-state i { font-size: 56px; margin-bottom: 14px; display: block; color: #cbd5e1; }
@@ -219,6 +240,12 @@
                             </div>
                         </div>
                         <span class="booking-status status-completed">${b.status}</span>
+                        <div class="booking-actions">
+                            <button type="button" class="btn-action btn-complaint"
+                                    onclick="openComplaintModal('${b.id}','${b.seatNumber}','${b.labName}','${b.startTime}')">
+                                <i class="fas fa-flag"></i> Report Issue
+                            </button>
+                        </div>
                     </div>
                 </c:forEach>
             </c:otherwise>
@@ -261,19 +288,77 @@
 
 </div>
 
+<!-- ══════════════════════════════════════
+     COMPLAINT MODAL
+     ══════════════════════════════════════ -->
+<div class="modal-overlay" id="complaintModal">
+    <div class="modal">
+        <h2>⚠️ Report an Issue</h2>
+        <p class="modal-sub">Describe the problem you experienced during this booking.</p>
+
+        <div class="modal-booking-info" id="modalBookingInfo"></div>
+
+        <form method="POST" action="${pageContext.request.contextPath}/submitComplaint">
+            <input type="hidden" name="bookingId" id="modalBookingId"/>
+
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select name="category" id="category" required>
+                    <option value="" disabled selected>Select a category...</option>
+                    <option value="HARDWARE">🖥️ Hardware (PC, monitor, keyboard)</option>
+                    <option value="SOFTWARE">💿 Software (crashes, errors)</option>
+                    <option value="NETWORK">📶 Network / Internet</option>
+                    <option value="CLEANLINESS">🧹 Cleanliness</option>
+                    <option value="NOISE">🔊 Noise / Disturbance</option>
+                    <option value="OTHER">📝 Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" id="description" required
+                          placeholder="Describe the issue in detail..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeComplaintModal()">Cancel</button>
+                <button type="submit" class="btn-modal-submit">Submit Complaint</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     function showTab(name, btn) {
         ['upcoming', 'past', 'cancelled'].forEach(function(tab) {
             document.getElementById('tab-' + tab).style.display = 'none';
         });
-
-        document.querySelectorAll('.tab').forEach(function(tabBtn) {
-            tabBtn.classList.remove('active');
-        });
-
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
         document.getElementById('tab-' + name).style.display = 'grid';
         btn.classList.add('active');
     }
+
+    function openComplaintModal(bookingId, seatNumber, labName, startTime) {
+        document.getElementById('modalBookingId').value = bookingId;
+        document.getElementById('modalBookingInfo').innerHTML =
+            '<strong>Booking #' + bookingId + '</strong> &nbsp;·&nbsp; ' +
+            seatNumber + ' — ' + labName + ' &nbsp;·&nbsp; ' + startTime;
+        document.getElementById('category').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('complaintModal').classList.add('open');
+    }
+
+    function closeComplaintModal() {
+        document.getElementById('complaintModal').classList.remove('open');
+    }
+
+    document.getElementById('complaintModal').addEventListener('click', function(e) {
+        if (e.target === this) closeComplaintModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeComplaintModal();
+    });
 </script>
 
 </body>
