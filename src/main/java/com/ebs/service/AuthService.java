@@ -87,7 +87,7 @@ public class AuthService {
         }
     }
 
-    public String login(String email, String password) throws Exception {
+   public String login(String email, String password) throws Exception {
         try {
             User user = em.createQuery(
                     "SELECT u FROM User u WHERE u.email = :email", User.class)
@@ -95,19 +95,20 @@ public class AuthService {
                     .getSingleResult();
 
             if (user.isBanned()) {
-                throw new Exception("User is banned.");
+                // Keep this one specific so the user knows they are locked out
+                throw new Exception("Your account has been suspended. Please contact administration.");
             }
 
-            // --- DEVELOPER DEBUG CHECK ---
             if (!user.getPassword().equals(password)) {
-                throw new Exception("DEBUG: Password mismatch! Database has [" + user.getPassword() + "] but you typed [" + password + "]");
+                // Standard, vague error for bad passwords
+                throw new Exception("Invalid email or password.");
             }
 
             return "mock-jwt-token-" + System.currentTimeMillis();
 
         } catch (NoResultException e) {
-            // --- DEVELOPER DEBUG CHECK ---
-            throw new Exception("DEBUG: Cannot find email [" + email + "] in the database!");
+            // The exact same vague error if the email doesn't exist at all
+            throw new Exception("Invalid email or password.");
         }
     }
     
