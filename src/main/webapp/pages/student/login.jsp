@@ -6,7 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Login – Enterprise Booking System</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<<<<<<< HEAD
   <link rel="stylesheet" href="../../css/styles.css"/>
+=======
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styles.css"/>
+>>>>>>> origin/feature/auth-and-ui
   <style>
   body { display: flex; flex-direction: column; }
 

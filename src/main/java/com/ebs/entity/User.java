@@ -13,6 +13,8 @@ import jakarta.validation.constraints.*;
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
+
+
 public abstract class User {
 
     @Id
@@ -40,6 +42,10 @@ public abstract class User {
 
     @Column(name = "ban_expiry")
     private java.time.LocalDateTime banExpiry;
+    
+    @Column(name = "role", insertable = false, updatable = false)
+    private String role;
+    
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -62,4 +68,8 @@ public abstract class User {
 
     public java.time.LocalDateTime getBanExpiry() { return banExpiry; }
     public void setBanExpiry(java.time.LocalDateTime banExpiry) { this.banExpiry = banExpiry; }
+    
+    public String getRole() { 
+        return role; 
+    }
 }

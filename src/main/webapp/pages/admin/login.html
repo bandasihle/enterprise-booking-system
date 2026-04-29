@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Login – Enterprise Booking System</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="../../css/styles.css"/>
   <style>
   body { display: flex; flex-direction: column; }
 
-  /* LEFT — light blue gradient (same as student register) */
   .left-panel {
     background: linear-gradient(145deg, #0F4C81 0%, #1e6fb5 50%, #2563EB 100%);
   }
@@ -30,10 +30,9 @@
   .left-panel h2  { color: white; }
   .left-panel > p { color: rgba(255,255,255,0.75); }
   .left-panel .feat-list li { color: rgba(255,255,255,0.9); }
-  .left-panel .feat-ico { background: rgba(255,255,255,0.15); }
+  .left-panel .feat-ico { background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; }
   .left-panel .dc { border: 1px solid rgba(255,255,255,0.1); }
 
-  /* Admin-specific styles (not in global) */
   .admin-warning {
     background: rgba(239,68,68,0.08);
     border: 1px solid rgba(239,68,68,0.2);
@@ -124,12 +123,12 @@
     justify-content: center;
     font-size: 28px;
     margin-bottom: 24px;
+    color: #EF4444;
   }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a href="../../test-index.html" class="nav-brand">
     <div class="logo-img-wrap">
@@ -148,33 +147,31 @@
     </div>
   </a>
   <div class="nav-links">
-    <span class="admin-nav-tag">🛡️ Admin Portal</span>
+    <span class="admin-nav-tag"><i class="fas fa-shield-alt"></i> Admin Portal</span>
     <a href="../../test-index.html" class="nav-a">Home</a>
   </div>
 </nav>
 
 <div class="split-page">
 
-  <!-- LEFT -->
   <div class="left-panel">
     <div class="admin-accent"></div>
     <div class="dc dc1"></div>
     <div class="dc dc2"></div>
     <div class="dc dc3"></div>
-    <div class="shield-wrap">🛡️</div>
-    <span class="l-tag">🔐 Restricted Access</span>
+    <div class="shield-wrap"><i class="fas fa-shield-alt"></i></div>
+    <span class="l-tag"><i class="fas fa-lock"></i> Restricted Access</span>
     <h2>Admin Control<br>Panel</h2>
     <p>Authorised administrators only. Full system management access for the Enterprise Booking System.</p>
     <ul class="feat-list">
-      <li><div class="feat-ico">👥</div> Manage all user accounts</li>
-      <li><div class="feat-ico">📊</div> View booking analytics</li>
-      <li><div class="feat-ico">🏛️</div> Configure venues &amp; labs</li>
-      <li><div class="feat-ico">⚙️</div> System settings &amp; controls</li>
-      <li><div class="feat-ico">📋</div> Approve or cancel bookings</li>
+      <li><div class="feat-ico"><i class="fas fa-users"></i></div> Manage all user accounts</li>
+      <li><div class="feat-ico"><i class="fas fa-chart-bar"></i></div> View booking analytics</li>
+      <li><div class="feat-ico"><i class="fas fa-building"></i></div> Configure venues &amp; labs</li>
+      <li><div class="feat-ico"><i class="fas fa-cog"></i></div> System settings &amp; controls</li>
+      <li><div class="feat-ico"><i class="fas fa-clipboard-check"></i></div> Approve or cancel bookings</li>
     </ul>
   </div>
 
-  <!-- RIGHT -->
   <div class="right-panel" style="display:flex;align-items:center;justify-content:center;padding:48px 32px;">
     <div class="login-card">
 
@@ -184,26 +181,17 @@
       </p>
 
       <div class="admin-warning">
-        <span style="font-size:16px;flex-shrink:0;">⚠️</span>
+        <span style="font-size:16px;flex-shrink:0;"><i class="fas fa-exclamation-triangle" style="color: #EF4444;"></i></span>
         <p>This area is restricted to authorised administrators only. Unauthorised access attempts are logged.</p>
       </div>
 
       <div id="toast" class="toast"></div>
 
       <div class="field">
-        <label for="adminId">Admin ID</label>
-        <div class="iw">
-          <span class="ii">🪪</span>
-          <input type="text" id="adminId" placeholder="e.g. ADMIN001" autocomplete="username"/>
-        </div>
-        <div class="fmsg" id="adminId-err">Admin ID is required.</div>
-      </div>
-
-      <div class="field">
         <label for="email">Email Address</label>
         <div class="iw">
-          <span class="ii">✉️</span>
-          <input type="email" id="email" placeholder="admin@example.com" autocomplete="email"/>
+          <span class="ii"><i class="fas fa-envelope"></i></span>
+          <input type="email" id="email" placeholder="admin@ebs.ac.za" autocomplete="email"/>
         </div>
         <div class="fmsg" id="email-err">Please enter a valid email address.</div>
       </div>
@@ -211,7 +199,7 @@
       <div class="field">
         <label for="pw">Password</label>
         <div class="iw">
-          <span class="ii">🔑</span>
+          <span class="ii"><i class="fas fa-key"></i></span>
           <input type="password" id="pw" placeholder="Enter admin password" autocomplete="current-password"/>
           <button class="toggle-pw" type="button" onclick="tpw('pw',this)">Show</button>
         </div>
@@ -221,7 +209,7 @@
       <div class="forgot-row"><a href="#">Forgot admin password?</a></div>
 
       <button class="btn-admin" id="adminBtn" onclick="doAdminLogin()">
-        <span>🛡️</span> Sign In as Admin
+        <i class="fas fa-shield-alt"></i> Sign In as Admin
       </button>
 
       <div class="admin-divider"><span>secure connection</span></div>
@@ -243,18 +231,6 @@
 </footer>
 
 <script>
-    /* Demo for admin testing login until backend works:
-     * 
-     * ADMIN ID: ADMIN001
-     * Email: admin@example.com
-     * Password:1234
-     */
-  if (!localStorage.getItem('ebs_admins')) {
-    localStorage.setItem('ebs_admins', JSON.stringify([
-      { adminId: 'ADMIN001', email: 'admin@example.com', password: '1234' }
-    ]));
-  }
-  /**/
   function tpw(id, btn) {
     const el = document.getElementById(id);
     el.type = el.type === 'password' ? 'text' : 'password';
@@ -270,43 +246,62 @@
 
   function showToast(msg, type) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast ' + type;
+    t.innerHTML = msg; 
+    t.className = 'toast ' + type;
   }
 
-  document.getElementById('adminId').addEventListener('input', function(){ if(this.value.trim()) setErr('adminId','adminId-err',false); });
   document.getElementById('email').addEventListener('input',   function(){ if(isEmail(this.value)) setErr('email','email-err',false); });
   document.getElementById('pw').addEventListener('input',      function(){ if(this.value) setErr('pw','pw-err',false); });
 
-  function doAdminLogin() {
-    const adminId = document.getElementById('adminId').value.trim();
+  async function doAdminLogin() {
     const email   = document.getElementById('email').value.trim();
     const pw      = document.getElementById('pw').value;
     let ok = true;
 
-    if (!adminId)        { setErr('adminId','adminId-err',true); ok=false; } else setErr('adminId','adminId-err',false);
     if (!isEmail(email)) { setErr('email','email-err',true);     ok=false; } else setErr('email','email-err',false);
     if (!pw)             { setErr('pw','pw-err',true);           ok=false; } else setErr('pw','pw-err',false);
     if (!ok) return;
 
     const btn = document.getElementById('adminBtn');
-    btn.disabled = true; btn.innerHTML = '<span>⏳</span> Verifying…';
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
 
-    /* ── Replace with fetch('/EnterpriseBookingSystem/AdminLoginServlet', ...) when backend is ready ── */
-    setTimeout(() => {
-      const admins = JSON.parse(localStorage.getItem('ebs_admins') || '[]');
-      const match  = admins.find(a => a.adminId === adminId && a.email === email && a.password === pw);
-      if (match) {
-        showToast('✅ Admin login successful! Redirecting…', 'ok');
-        setTimeout(() => window.location.href = '../../test-index.html', 1400);
+    try {
+      const response = await fetch('/EnterpriseBookingSystem/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: pw })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Enforce Role-Based Access Control on the frontend
+        if (data.role && data.role.toLowerCase() === 'admin') {
+          showToast('<i class="fas fa-check-circle"></i> Admin login successful! Redirecting...', 'ok');
+          // Save JWT token
+          localStorage.setItem('jwtToken', data.token);
+          localStorage.setItem('userRole', data.role);
+          
+          // Redirect to the dashboard your colleague built
+          setTimeout(() => window.location.href = '../../admin/dashboard.jsp', 1400);
+        } else {
+          // If a student/lecturer credentials work, but they aren't an admin
+          showToast('<i class="fas fa-ban"></i> Access Denied. Insufficient privileges.', 'err');
+          btn.disabled = false; btn.innerHTML = '<i class="fas fa-shield-alt"></i> Sign In as Admin';
+        }
       } else {
-        showToast('❌ Invalid credentials. Access denied.', 'err');
-        btn.disabled = false; btn.innerHTML = '<span>🛡️</span> Sign In as Admin';
+        showToast('<i class="fas fa-times-circle"></i> ' + (data.error || 'Invalid credentials.'), 'err');
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-shield-alt"></i> Sign In as Admin';
       }
-    }, 900);
-    /* ── End demo block ── */
+    } catch (error) {
+      showToast('<i class="fas fa-exclamation-circle"></i> Network error. Is GlassFish running?', 'err');
+      btn.disabled = false; btn.innerHTML = '<i class="fas fa-shield-alt"></i> Sign In as Admin';
+    }
   }
 
   document.addEventListener('keydown', e => { if(e.key === 'Enter') doAdminLogin(); });
+  
+  
 </script>
 </body>
 </html>

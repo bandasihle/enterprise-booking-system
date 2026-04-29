@@ -23,7 +23,7 @@ public class AuthResource {
 
     // --- Updated Data Records ---
     public record RegisterInitRequest(String email, String studentNo) {}
-    public record RegisterRequest(String studentNo, String fullName, String email, String password, String otpCode) {}
+    public record RegisterRequest(String studentNo, String fullName, String email, String password, String otpCode, String role) {}
     public record LoginRequest(String email, String password) {}
 
     /**
@@ -63,25 +63,25 @@ public class AuthResource {
      * POST /api/auth/login
      * Single-step login. Returns JWT immediately.
      */
-   @POST
+    @POST
     @Path("/login")
     public Response login(LoginRequest request) {
         try {
+            // 1. Authenticate the user and generate the JWT token
             String jwtToken = authService.login(request.email(), request.password());
             
-            // --- THE UPDATED SESSION BRIDGE ---
-            // 1. Fetch the full User/Student object from your database.
-            // (Note: Change 'getUserByEmail' to whatever method your AuthService actually uses!)
+            // 2. Fetch the full User object from the database
             User loggedInUser = authService.getUserByEmail(request.email()); 
             
+            // 3. Save the session data so the traditional Servlets know who is logged in
             httpRequest.getSession(true).setAttribute("user", loggedInUser);
             httpRequest.getSession(true).setAttribute("userId", loggedInUser.getId());
-            
-            // 2. Save the ENTIRE object into the session under the name "user"
-            httpRequest.getSession(true).setAttribute("user", loggedInUser);
-            // ----------------------------------
 
-            return Response.ok("{\"token\": \"" + jwtToken + "\", \"message\": \"Login successful.\"}").build();
+            // 4. Read the exact role directly from the entity (e.g., "STUDENT" or "LECTURER")
+            String userRole = loggedInUser.getRole().toLowerCase();
+
+            // 5. Send the role and token back to the JavaScript frontend
+            return Response.ok("{\"token\": \"" + jwtToken + "\", \"role\": \"" + userRole + "\", \"message\": \"Login successful.\"}").build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"error\": \"" + e.getMessage() + "\"}").build();
