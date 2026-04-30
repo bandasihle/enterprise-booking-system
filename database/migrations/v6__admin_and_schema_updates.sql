@@ -58,3 +58,11 @@ VALUES
 ON DUPLICATE KEY UPDATE 
     role = VALUES(role),
     is_banned = 0;
+
+    USE ebs_db;
+
+-- Find the users we just created and link their IDs into the admin table
+INSERT IGNORE INTO admin (ID, clearance_level)
+SELECT ID, 'SYSTEM_ADMIN' 
+FROM users 
+WHERE role = 'ADMIN';
