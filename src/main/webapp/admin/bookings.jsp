@@ -127,12 +127,20 @@
             return;
           }
           
+          // 2. Build the Table
           var html = '';
           for (var j = 0; j < bookings.length; j++) {
             var b  = bookings[j];
-            var sUpper = (b.status || '').toUpperCase();
+            var rawStatus = b.status || '';
+            var sUpper = rawStatus.toUpperCase();
             
-            // Fix the badge colors to match the new vocabulary
+            // --- NEW: UI Display Name Interception ---
+            var displayStatus = rawStatus;
+            if (sUpper === 'NO_SHOW') {
+                displayStatus = 'Not confirmed';
+            }
+            // -----------------------------------------
+            
             var bc = (sUpper === 'APPROVED' || sUpper === 'CONFIRMED') ? 'success' : 
                      (sUpper === 'PENDING') ? 'warning' : 'danger';
             
@@ -146,7 +154,8 @@
               + '<td>' + esc(b.seat_label || b.seat_id || '') + '</td>'
               + '<td>' + esc(b.booking_date || '') + '</td>'
               + '<td>' + esc(b.booking_time || '') + '</td>'
-              + '<td><span class="badge ' + bc + '">' + esc(b.status) + '</span></td>'
+              // Inject the pretty displayStatus instead of the raw database status
+              + '<td><span class="badge ' + bc + '">' + esc(displayStatus) + '</span></td>'
               + '<td>' + btn + '</td>'
               + '</tr>';
           }
