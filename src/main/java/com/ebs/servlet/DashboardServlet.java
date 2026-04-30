@@ -30,7 +30,7 @@ public class DashboardServlet extends HttpServlet {
 
         Long studentId = getStudentId(req);
         if (studentId == null) {
-            resp.sendRedirect(req.getContextPath() + "/index.html");
+            resp.sendRedirect(req.getContextPath() + "/index.jsp");
             return;
         }
 

@@ -104,7 +104,7 @@ public class LoginServlet extends HttpServlet {
                     resp.sendRedirect(req.getContextPath() + "/pages/lecturer/login.jsp");
                     break;
                 case "ADMIN":
-                    resp.sendRedirect(req.getContextPath() + "/pages/admin/login.jsp");
+                    resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
                     break;
                 default:
                     resp.sendRedirect(req.getContextPath() + "/index.jsp");

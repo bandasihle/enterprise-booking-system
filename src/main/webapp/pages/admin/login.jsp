@@ -281,8 +281,19 @@
 
   function showToast(msg, type) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast ' + type;
+    t.textContent = msg;
+    t.className = 'toast ' + type;
   }
+
+  // Show server-side errors from redirect
+  <% String err = request.getParameter("error");
+     if ("invalid".equals(err)) { %>
+       showToast('❌ Invalid credentials. Access denied.', 'err');
+  <% } else if ("missing".equals(err)) { %>
+       showToast('⚠️ Please fill in all fields.', 'err');
+  <% } else if ("server".equals(err)) { %>
+       showToast('🔴 Server error. Please try again.', 'err');
+  <% } %>
 
   document.getElementById('adminId').addEventListener('input', function(){ if(this.value.trim()) setErr('adminId','adminId-err',false); });
   document.getElementById('email').addEventListener('input',   function(){ if(isEmail(this.value)) setErr('email','email-err',false); });
@@ -300,21 +311,24 @@
     if (!ok) return;
 
     const btn = document.getElementById('adminBtn');
-    btn.disabled = true; btn.innerHTML = '<span>⏳</span> Verifying…';
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> Verifying…';
 
-    /* ── Replace with fetch('/EnterpriseBookingSystem/AdminLoginServlet', ...) when backend is ready ── */
-    setTimeout(() => {
-      const admins = JSON.parse(localStorage.getItem('ebs_admins') || '[]');
-      const match  = admins.find(a => a.adminId === adminId && a.email === email && a.password === pw);
-      if (match) {
-        showToast('✅ Admin login successful! Redirecting…', 'ok');
-        setTimeout(() => window.location.href = '../../index.jsp', 1400);
-      } else {
-        showToast('❌ Invalid credentials. Access denied.', 'err');
-        btn.disabled = false; btn.innerHTML = '<span>🛡️</span> Sign In as Admin';
-      }
-    }, 900);
-    /* ── End demo block ── */
+    // POST to AdminLoginServlet — no more localStorage
+    const form    = document.createElement('form');
+    form.method   = 'POST';
+    form.action   = '${pageContext.request.contextPath}/admin/login';
+
+    [['adminCode', adminId], ['email', email], ['password', pw]].forEach(([name, val]) => {
+      const inp = document.createElement('input');
+      inp.type  = 'hidden';
+      inp.name  = name;
+      inp.value = val;
+      form.appendChild(inp);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
   }
 
   document.addEventListener('keydown', e => { if(e.key === 'Enter') doAdminLogin(); });
