@@ -3,7 +3,6 @@ com\ebs\entity\Seat.class
 com\ebs\controllers\AddUserServlet.class
 com\ebs\rest\AuthResource$LoginRequest.class
 com\ebs\auth\OtpService.class
-com\ebs\controllers\UpdateComplaintServlet.class
 com\ebs\entity\Student.class
 com\ebs\entity\Complaint$Status.class
 com\ebs\controllers\ComplaintServlet.class
@@ -12,7 +11,6 @@ com\ebs\entity\Admin.class
 com\ebs\entity\OtpToken.class
 com\ebs\config\DatabaseConnection.class
 com\ebs\rest\ApplicationConfig.class
-com\ebs\models\User.class
 com\ebs\servlet\ComplaintServlet.class
 com\ebs\dto\SeatDTO.class
 com\ebs\controllers\SuspendUserServlet.class

@@ -22,23 +22,37 @@ public class AddUserServlet extends HttpServlet {
         sb.append("{\"users\":[");
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "SELECT id, role, is_banned, EMAIL, full_name FROM users ORDER BY id";
+            // FIX: Added is_suspended and suspended_until to the SELECT statement
+            String sql = "SELECT id, role, is_banned, is_suspended, " +
+                         "DATE_FORMAT(suspended_until, '%d %b %Y %H:%i') AS suspended_until, " +
+                         "EMAIL, full_name FROM users ORDER BY id DESC";
+                         
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             boolean first = true;
+            
             while (rs.next()) {
                 if (!first) sb.append(",");
                 first = false;
-                int id         = rs.getInt("id");
-                String role    = rs.getString("role");
+                
+                int id = rs.getInt("id");
+                String role = rs.getString("role");
                 boolean banned = rs.getBoolean("is_banned");
-                String email   = rs.getString("EMAIL");
-                String name    = rs.getString("full_name");
+                
+                // FIX: Extract the new suspension data
+                boolean suspended = rs.getBoolean("is_suspended");
+                String susUntil = rs.getString("suspended_until");
+                
+                String email = rs.getString("EMAIL");
+                String name = rs.getString("full_name");
                 if (name == null) name = "";
+                
                 sb.append("{")
                   .append("\"id\":").append(id).append(",")
                   .append("\"role\":\"").append(escape(role)).append("\",")
                   .append("\"is_banned\":").append(banned).append(",")
+                  .append("\"is_suspended\":").append(suspended).append(",") // Added to JSON
+                  .append("\"suspended_until\":").append(susUntil != null ? "\"" + escape(susUntil) + "\"" : "null").append(",") // Added to JSON
                   .append("\"email\":\"").append(escape(email)).append("\",")
                   .append("\"full_name\":\"").append(escape(name)).append("\"")
                   .append("}");
@@ -47,7 +61,6 @@ public class AddUserServlet extends HttpServlet {
             System.out.println("UserServlet GET error: " + e.getMessage());
             e.printStackTrace();
         }
-
         sb.append("]}");
         out.print(sb.toString());
     }

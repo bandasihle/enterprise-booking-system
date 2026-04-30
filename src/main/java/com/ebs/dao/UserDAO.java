@@ -1,7 +1,7 @@
 package com.ebs.dao;
 
 import com.ebs.config.DatabaseConnection;
-import com.ebs.models.User;
+import com.ebs.entity.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

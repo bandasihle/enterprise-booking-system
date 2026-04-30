@@ -32,10 +32,8 @@ public class ComplaintServlet extends HttpServlet {
                 "       c.description, c.category, c.status, c.resolution, " +
                 "       DATE_FORMAT(c.created_at, '%d %b %Y') AS complaint_date " +
                 "FROM complaints c " +
-                // 1. Join complaints to bookings using the booking_id
-                "LEFT JOIN bookings b ON c.booking_id = b.id " +
-                // 2. Join bookings to users to get the student's name
-                "LEFT JOIN users u ON b.user_id = u.id " +
+                "LEFT JOIN bookings b ON c.booking_id = b.ID " +
+                "LEFT JOIN users u ON b.user_id = u.ID " +
                 "ORDER BY c.ID DESC";
 
             PreparedStatement ps = conn.prepareStatement(sql);
