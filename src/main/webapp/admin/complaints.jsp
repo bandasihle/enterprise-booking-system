@@ -104,10 +104,16 @@
           var complaints = data.complaints || [];
           var open = 0, resolved = 0, inProgress = 0;
           for (var i = 0; i < complaints.length; i++) {
-            var s = complaints[i].status;
-            if (s === 'Open' || s === 'Urgent') open++;
-            else if (s === 'Resolved')          resolved++;
-            else if (s === 'In Progress')       inProgress++;
+            // Force uppercase to prevent case-sensitivity bugs
+            var sUpper = (complaints[i].status || '').toUpperCase();
+            
+            if (sUpper === 'OPEN' || sUpper === 'URGENT' || sUpper === 'PENDING') {
+                open++;
+            } else if (sUpper === 'RESOLVED') {
+                resolved++;
+            } else if (sUpper === 'IN PROGRESS') {
+                inProgress++;
+            }
           }
           document.getElementById('openCasesCount').textContent  = open;
           document.getElementById('resolvedCount').textContent   = resolved;

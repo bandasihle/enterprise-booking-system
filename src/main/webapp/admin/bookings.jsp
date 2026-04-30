@@ -105,9 +105,17 @@
           var bookings = data.bookings || [];
           var approved = 0, pending = 0, cancelled = 0;
           for (var i = 0; i < bookings.length; i++) {
-            if (bookings[i].status === 'Approved')  approved++;
-            else if (bookings[i].status === 'Pending')   pending++;
-            else if (bookings[i].status === 'Cancelled') cancelled++;
+            // Force uppercase to prevent case-sensitivity bugs
+            var s = (bookings[i].status || '').toUpperCase();
+            
+            // Map the database vocabulary to the UI cards
+            if (s === 'APPROVED' || s === 'CONFIRMED') {
+                approved++;
+            } else if (s === 'PENDING') {
+                pending++;
+            } else if (s === 'CANCELLED' || s === 'NO_SHOW') {
+                cancelled++;
+            }
           }
           document.getElementById('approvedCount').textContent  = approved;
           document.getElementById('pendingCount').textContent   = pending;
@@ -118,13 +126,20 @@
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#888;">No bookings found.</td></tr>';
             return;
           }
+          
           var html = '';
           for (var j = 0; j < bookings.length; j++) {
             var b  = bookings[j];
-            var bc = b.status === 'Approved' ? 'success' : b.status === 'Pending' ? 'warning' : 'danger';
-            var btn = b.status === 'Pending'
+            var sUpper = (b.status || '').toUpperCase();
+            
+            // Fix the badge colors to match the new vocabulary
+            var bc = (sUpper === 'APPROVED' || sUpper === 'CONFIRMED') ? 'success' : 
+                     (sUpper === 'PENDING') ? 'warning' : 'danger';
+            
+            var btn = (sUpper === 'PENDING')
               ? '<button class="table-btn" data-id="' + b.id + '" data-action="approve">Approve</button>'
               : '<button class="table-btn" data-id="' + b.id + '" data-action="view">View</button>';
+              
             html += '<tr>'
               + '<td>' + esc(b.student_name || b.student_email || '') + '</td>'
               + '<td>' + esc(b.lab_name || '') + '</td>'

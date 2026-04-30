@@ -23,17 +23,19 @@ public class BookingServlet extends HttpServlet {
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             String sql =
-                "SELECT b.id, " +
+                "SELECT b.ID as id, " +
                 "       u.full_name AS student_name, u.EMAIL AS student_email, " +
-                "       l.lab_name AS lab_name, " +  // FIXED: Changed l.name to l.lab_name
-                "       s.label AS seat_label, b.seat_id, " + 
-                "       DATE_FORMAT(b.booking_date, '%d %b %Y') AS booking_date, " +
+                "       l.lab_name AS lab_name, " +
+                "       s.seat_number AS seat_label, " + 
+                "       b.seat_id, " +  // FIX 1: We must select seat_id so the loop below can find it!
+                "       DATE_FORMAT(b.start_time, '%d %b %Y') AS booking_date, " + 
+                "       DATE_FORMAT(b.start_time, '%H:%i') AS booking_time, " + // FIX 2: Added formatted time for the UI
                 "       b.status " +
                 "FROM bookings b " +
-                "LEFT JOIN users u ON b.user_id = u.id " +
-                "LEFT JOIN labs l ON b.lab_id = l.id " +
-                "LEFT JOIN seats s ON b.seat_id = s.id " +
-                "ORDER BY b.id DESC";
+                "LEFT JOIN users u ON b.user_id = u.ID " +
+                "LEFT JOIN seats s ON b.seat_id = s.ID " + 
+                "LEFT JOIN labs l ON s.lab_id = l.ID " +   
+                "ORDER BY b.ID DESC";
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -49,6 +51,7 @@ public class BookingServlet extends HttpServlet {
                   .append("\"seat_label\":\"").append(escape(rs.getString("seat_label"))).append("\",")
                   .append("\"seat_id\":\"").append(escape(rs.getString("seat_id"))).append("\",")
                   .append("\"booking_date\":\"").append(escape(rs.getString("booking_date"))).append("\",")
+                  .append("\"booking_time\":\"").append(escape(rs.getString("booking_time"))).append("\",") // Added time to JSON
                   .append("\"status\":\"").append(escape(rs.getString("status"))).append("\"")
                   .append("}");
             }
