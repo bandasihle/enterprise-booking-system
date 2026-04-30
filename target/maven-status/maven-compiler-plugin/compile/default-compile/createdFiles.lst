@@ -37,7 +37,9 @@ com\ebs\dao\ComplaintDAO.class
 com\ebs\entity\Lab.class
 com\ebs\rest\BookingResource.class
 com\ebs\service\AdminService.class
+com\ebs\servlet\LecturerServlet.class
 com\ebs\models\Complaint.class
+com\ebs\ejb\LecturerBlockService.class
 com\ebs\service\LabService.class
 com\ebs\entity\User.class
 com\ebs\entity\Lecturer.class
@@ -58,7 +60,9 @@ com\ebs\util\EmailService.class
 com\ebs\service\ComplaintService.class
 com\ebs\servlet\BookingServlet.class
 com\ebs\ejb\ComplaintService.class
+com\ebs\servlet\DbCheckServlet.class
 com\ebs\controllers\CheckSuspensionServlet.class
 com\ebs\ejb\NoShowScheduler.class
+com\ebs\entity\LecturerBlock.class
 com\ebs\ejb\BanEnforcementScheduler.class
 com\ebs\models\LabBlock.class
