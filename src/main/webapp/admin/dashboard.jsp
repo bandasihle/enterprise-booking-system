@@ -119,6 +119,7 @@
         <a href="bookings.jsp" class="nav-item">Bookings</a>
         <a href="resources.jsp" class="nav-item">Resources</a>
         <a href="complaints.jsp" class="nav-item">Complaints</a>
+        <a href="${pageContext.request.contextPath}/AdminLogoutServlet"   class="nav-item">Logout</a>
       </nav>
     </div>
 

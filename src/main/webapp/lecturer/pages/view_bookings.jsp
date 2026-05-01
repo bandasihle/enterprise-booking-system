@@ -13,7 +13,7 @@
 
 <nav class="top-navbar">
   <div style="display:flex;align-items:center;gap:28px;">
-    <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
+    <a href="${pageContext.request.contextPath}/test-index.html" class="nav-brand">
       <div class="nav-brand-text"><strong>EBS</strong><span> Lecturer</span></div>
     </a>
     <nav class="nav-menu">

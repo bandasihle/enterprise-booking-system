@@ -181,7 +181,7 @@
 <!-- NAV -->
 
 <nav class="navbar">
-<a href="${pageContext.request.contextPath}/index.jsp" style="text-decoration: none; color: inherit;">
+<a href="${pageContext.request.contextPath}/test-index.html" style="text-decoration: none; color: inherit;">
     <div class="logo">
         <img src="${pageContext.request.contextPath}/images/logo.jpeg" class="logo-img" alt="EBS">
         <span>EBS</span>
@@ -190,6 +190,7 @@
     <div class="nav-links">
         <a href="${pageContext.request.contextPath}/student/dashboard" class="active">Dashboard</a>
         <a href="${pageContext.request.contextPath}/student/mybookings">My Bookings</a>
+        <a href="${pageContext.request.contextPath}/StudentLogoutServlet">Logout</a>
     </div>
 </nav>
 

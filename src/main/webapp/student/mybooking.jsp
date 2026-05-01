@@ -105,7 +105,7 @@
 <body>
 
 <nav class="navbar">
-    <a href="${pageContext.request.contextPath}/index.jsp" style="text-decoration:none;color:inherit;">
+    <a href="${pageContext.request.contextPath}/test-index.html" style="text-decoration:none;color:inherit;">
         <div class="logo">
             <img src="${pageContext.request.contextPath}/images/logo.jpeg" alt="EBS">
             <span>EBS</span>

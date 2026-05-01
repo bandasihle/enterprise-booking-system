@@ -109,7 +109,7 @@
 
 <!-- NAV -->
 <nav>
-  <a href="../../index.jsp" class="nav-brand">
+  <a href="../../test-index.html" class="nav-brand">
     <div class="logo-img-wrap">
       <img src="../../assets/logo.png" alt="Logo"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>

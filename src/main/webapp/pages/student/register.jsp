@@ -107,7 +107,7 @@
 <body>
 
 <nav>
-  <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
+  <a href="${pageContext.request.contextPath}/test-index.html" class="nav-brand">
     <div class="logo-img-wrap">
       <img src="${pageContext.request.contextPath}/assets/logo.jpg" alt="Logo"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
