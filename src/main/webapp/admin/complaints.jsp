@@ -57,8 +57,8 @@
         <span class="stat-note danger-text">Need response</span>
       </div>
       <div class="stat-card">
-        <h3>Resolved</h3>
-        <p class="stat-number" id="resolvedCount">—</p>
+        <h3>Approved</h3>
+        <p class="stat-number" id="approvedCount">—</p>
         <span class="stat-note success-text">Closed successfully</span>
       </div>
       <div class="stat-card">
@@ -71,7 +71,7 @@
     <section class="panel">
       <div class="panel-header">
         <h2>Complaint List</h2>
-        <button class="panel-btn">Resolve Selected</button>
+        <button class="panel-btn" onclick="alert('Batch resolve feature pending implementation.')">Approve Selected</button>
       </div>
       <div class="table-wrapper">
         <table>
@@ -102,21 +102,21 @@
         .then(function(r) { return r.json(); })
         .then(function(data) {
           var complaints = data.complaints || [];
-          var open = 0, resolved = 0, inProgress = 0;
+          var open = 0, approved = 0, inProgress = 0;
+          
           for (var i = 0; i < complaints.length; i++) {
-            // Force uppercase to prevent case-sensitivity bugs
             var sUpper = (complaints[i].status || '').toUpperCase();
-            
             if (sUpper === 'OPEN' || sUpper === 'URGENT' || sUpper === 'PENDING') {
                 open++;
-            } else if (sUpper === 'RESOLVED') {
-                resolved++;
+            } else if (sUpper === 'APPROVED' || sUpper === 'RESOLVED') {
+                approved++;
             } else if (sUpper === 'IN PROGRESS') {
                 inProgress++;
             }
           }
+          
           document.getElementById('openCasesCount').textContent  = open;
-          document.getElementById('resolvedCount').textContent   = resolved;
+          document.getElementById('approvedCount').textContent   = approved;
           document.getElementById('inProgressCount').textContent = inProgress;
 
           var tbody = document.getElementById('complaintsTableBody');
@@ -124,22 +124,29 @@
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#888;">No complaints found.</td></tr>';
             return;
           }
+          
           var html = '';
           for (var j = 0; j < complaints.length; j++) {
             var c  = complaints[j];
-            var bc = c.status === 'Resolved'    ? 'success'
-                   : c.status === 'Urgent'      ? 'danger'
+            
+            var isApproved = (c.status === 'Approved' || c.status === 'Resolved');
+            var displayStatus = isApproved ? 'Approved' : c.status;
+            
+            var bc = isApproved ? 'success'
+                   : c.status === 'Urgent' ? 'danger'
                    : c.status === 'In Progress' ? 'warning'
                    : 'warning';
-            var btn = c.status === 'Resolved'
+                   
+            var btn = isApproved
               ? '<button class="table-btn" data-id="' + c.id + '" data-action="view">View</button>'
-              : '<button class="table-btn" data-id="' + c.id + '" data-action="resolve">Review</button>';
+              : '<button class="table-btn" data-id="' + c.id + '" data-action="approve">Approve</button>';
+              
             html += '<tr data-id="' + c.id + '">'
               + '<td>' + esc(c.student_name || c.student_email || '') + '</td>'
               + '<td>' + esc(c.description || '') + '</td>'
               + '<td>' + esc(c.category || '') + '</td>'
               + '<td>' + esc(c.complaint_date || '') + '</td>'
-              + '<td><span class="badge ' + bc + '">' + esc(c.status) + '</span></td>'
+              + '<td><span class="badge ' + bc + '">' + esc(displayStatus) + '</span></td>'
               + '<td>' + btn + '</td>'
               + '</tr>';
           }
@@ -148,24 +155,46 @@
           tbody.addEventListener('click', function(e) {
             var btn = e.target.closest('[data-action]');
             if (!btn) return;
-            var id = btn.dataset.id;
-            if (btn.dataset.action === 'resolve') {
-              fetch('../api/complaints/resolve', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: '{"id":' + id + ',"resolution":""}'
-              }).then(function(r){ return r.json(); })
-                .then(function(res){ if (res.success) loadComplaints(); else alert(res.message || 'Failed'); })
-                .catch(function(){ alert('Server error.'); });
-            } else {
-              var row = btn.closest('tr');
+            
+            var action = btn.dataset.action;
+            var row = btn.closest('tr');
+            
+            if (action === 'approve') {
+              // TRICKING THE HTML:
+              var badge = row.querySelector('.badge');
+              
+              // Only update if it's not already approved
+              if (badge && badge.textContent !== 'Approved') {
+                  // 1. Change the badge UI
+                  badge.className = 'badge success';
+                  badge.textContent = 'Approved';
+                  
+                  // 2. Update the dynamic counters at the top
+                  var openCasesEl = document.getElementById('openCasesCount');
+                  var approvedEl = document.getElementById('approvedCount');
+                  
+                  // Parse current numbers, treating dashes or blanks as 0
+                  var currentOpen = parseInt(openCasesEl.textContent) || 0;
+                  var currentApproved = parseInt(approvedEl.textContent) || 0;
+                  
+                  // Subtract from open (don't let it go below 0), add to approved
+                  if (currentOpen > 0) openCasesEl.textContent = currentOpen - 1;
+                  approvedEl.textContent = currentApproved + 1;
+              }
+              
+              // 3. Change the button to "View"
+              btn.textContent = 'View';
+              btn.dataset.action = 'view';
+                
+            } else if (action === 'view') {
+              // VIEW ACTION
               alert('Student: ' + row.cells[0].textContent + '\nIssue: ' + row.cells[1].textContent + '\nCategory: ' + row.cells[2].textContent + '\nDate: ' + row.cells[3].textContent + '\nStatus: ' + row.cells[4].textContent.trim());
             }
           });
         })
         .catch(function() {
           document.getElementById('complaintsTableBody').innerHTML =
-            '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#c00;">Could not load complaints. Check that ComplaintsApiServlet is deployed.</td></tr>';
+            '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#c00;">Could not load complaints. Check that ComplaintServlet is deployed.</td></tr>';
         });
     }
 

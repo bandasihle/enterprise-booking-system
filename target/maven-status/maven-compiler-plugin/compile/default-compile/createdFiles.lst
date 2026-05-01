@@ -56,6 +56,7 @@ com\ebs\rest\AuthResource$RegisterInitRequest.class
 com\ebs\models\Lab.class
 com\ebs\util\PasswordUtil.class
 com\ebs\service\AuthService.class
+com\ebs\controllers\GetUsersServlet.class
 com\ebs\servlet\DashboardServlet.class
 com\ebs\util\EmailService.class
 com\ebs\service\ComplaintService.class

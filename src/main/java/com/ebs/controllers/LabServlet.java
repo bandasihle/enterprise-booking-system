@@ -6,28 +6,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.io.PrintWriter;
+import java.sql.*;
 
-/*
- * Handles all lab-related API endpoints:
- *
- * GET  /api/labs         → returns all labs from database
- * POST /api/labs/add     → inserts a new lab
- * POST /api/labs/update  → updates lab status (Active/Maintenance)
- *
- * Uses wildcard mapping /api/labs/* to handle all sub-paths.
- */
 @WebServlet("/api/labs/*")
 public class LabServlet extends HttpServlet {
 
-    /*
-     * GET /api/labs
-     * Returns all labs as JSON.
-     * Called every time resources.jsp loads — ensures labs
-     * always reflect the real database, not hardcoded HTML.
-     */
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response)
@@ -35,242 +19,192 @@ public class LabServlet extends HttpServlet {
 
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        StringBuilder sb = new StringBuilder("{\"labs\":[");
 
         try (Connection conn = DatabaseConnection.getConnection()) {
 
-            PreparedStatement ps = conn.prepareStatement(
-                "SELECT ID, lab_name, building, capacity, status FROM labs ORDER BY ID ASC"
-            );
+            String sql =
+                "SELECT l.id, " +
+                "       l.lab_name, " +
+                "       l.building, " +
+                "       l.capacity            AS total_pcs, " +
+                "       COALESCE(SUM(s.is_available), 0) AS available_pcs, " +
+                "       l.status " +
+                "FROM labs l " +
+                "LEFT JOIN seats s ON s.lab_id = l.id " +
+                "GROUP BY l.id, l.lab_name, l.building, l.capacity, l.status " +
+                "ORDER BY l.id ASC";
 
+            PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            StringBuilder labs = new StringBuilder("[");
+
             boolean first = true;
-
             while (rs.next()) {
-                if (!first) labs.append(",");
+                if (!first) sb.append(",");
                 first = false;
-
-                String status = rs.getString("status");
-                if (status == null || status.isEmpty()) status = "Active";
-
-                int capacity = rs.getInt("capacity");
-
-                labs.append("{")
-                    .append("\"id\":").append(rs.getInt("ID")).append(",")
-                    .append("\"name\":\"").append(safe(rs.getString("lab_name"))).append("\",")
-                    .append("\"building\":\"").append(safe(rs.getString("building"))).append("\",")
-                    .append("\"total_pcs\":").append(capacity).append(",")
-                    .append("\"available_pcs\":").append(capacity).append(",")
-                    .append("\"status\":\"").append(safe(status)).append("\"")
-                    .append("}");
+                sb.append("{")
+                  .append("\"id\":").append(rs.getLong("id")).append(",")
+                  .append("\"name\":\"").append(esc(rs.getString("lab_name"))).append("\",")
+                  .append("\"building\":\"").append(esc(rs.getString("building"))).append("\",")
+                  .append("\"total_pcs\":").append(rs.getInt("total_pcs")).append(",")
+                  .append("\"available_pcs\":").append(rs.getInt("available_pcs")).append(",")
+                  .append("\"status\":\"").append(esc(rs.getString("status"))).append("\"")
+                  .append("}");
             }
 
-            labs.append("]");
-
-            String json = "{\"labs\":" + labs + "}";
-            System.out.println("✅ Labs loaded: " + json);
-            response.getWriter().write(json);
-
         } catch (Exception e) {
-            System.out.println("❌ Get labs error: " + e.getMessage());
+            System.err.println("LabServlet GET error: " + e.getMessage());
             e.printStackTrace();
-            response.getWriter().write("{\"labs\":[]}");
         }
+
+        sb.append("]}");
+        out.print(sb.toString());
     }
 
-    /*
-     * POST /api/labs/add    → insert new lab
-     * POST /api/labs/update → update lab status
-     *
-     * Reads pathInfo to decide which action to perform.
-     */
     @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response)
             throws ServletException, IOException {
 
         response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
 
-        String path = request.getPathInfo(); // "/add" or "/update"
+        String path = request.getPathInfo();
 
-        // Read request body
-        StringBuilder sb = new StringBuilder();
+        StringBuilder bodySb = new StringBuilder();
         String line;
-        while ((line = request.getReader().readLine()) != null) sb.append(line);
-        String body = sb.toString();
+        java.io.BufferedReader reader = request.getReader();
+        while ((line = reader.readLine()) != null) bodySb.append(line);
+        String body = bodySb.toString();
 
-        System.out.println("📥 LabsServlet [" + path + "] body: " + body);
-
-        if ("/add".equals(path)) {
-            handleAddLab(body, response);
-        } else if ("/update".equals(path)) {
-            handleUpdateLab(body, response);
-        } else {
-            response.getWriter().write(
-                "{\"success\":false,\"message\":\"Unknown action: " + path + "\"}"
-            );
+        try {
+            if ("/add".equals(path)) {
+                handleAdd(body, out);
+            } else if ("/update".equals(path)) {
+                handleUpdate(body, out);
+            } else {
+                out.print("{\"success\":false,\"message\":\"Unknown endpoint\"}");
+            }
+        } catch (Exception e) {
+            System.err.println("LabServlet POST error: " + e.getMessage());
+            e.printStackTrace();
+            out.print("{\"success\":false,\"message\":\"" + esc(e.getMessage()) + "\"}");
         }
     }
 
-    /*
-     * Inserts a new lab into the labs table.
-     * Expects JSON: { "name": "Lab A", "total_pcs": "30", "status": "Active" }
-     */
-    private void handleAddLab(String body,
-                               HttpServletResponse response)
-            throws IOException {
-
-        String name     = extractJson(body, "name");
-        String status   = extractJson(body, "status");
-        String pcsStr   = extractJsonNumber(body, "total_pcs");
-
-        // Fallback field names in case JS sends different keys
-        if (name.isEmpty())   name   = extractJson(body, "labName");
-        if (name.isEmpty())   name   = extractJson(body, "lab_name");
-        if (status.isEmpty()) status = "Active";
-        if (pcsStr.isEmpty()) pcsStr = extractJsonNumber(body, "capacity");
-
-        int totalPcs = pcsStr.isEmpty() ? 0 : Integer.parseInt(pcsStr.trim());
-
-        System.out.println("🏫 Adding lab: name=" + name + " pcs=" + totalPcs + " status=" + status);
+    private void handleAdd(String body, PrintWriter out) throws Exception {
+        String name     = extractStr(body, "name");
+        String status   = extractStr(body, "status");
+        int    totalPcs = extractInt(body, "total_pcs");
 
         if (name.isEmpty()) {
-            response.getWriter().write(
-                "{\"success\":false,\"message\":\"Lab name is required\"}"
-            );
+            out.print("{\"success\":false,\"message\":\"Lab name is required\"}");
             return;
         }
-
         if (totalPcs < 1) {
-            response.getWriter().write(
-                "{\"success\":false,\"message\":\"Total PCs must be at least 1\"}"
-            );
+            out.print("{\"success\":false,\"message\":\"Total PCs must be at least 1\"}");
             return;
         }
+        if (status.isEmpty()) status = "Active";
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-
-            PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO labs (lab_name, building, capacity, status) VALUES (?, ?, ?, ?)"
+            PreparedStatement insLab = conn.prepareStatement(
+                "INSERT INTO labs (lab_name, building, capacity, status) VALUES (?, ?, ?, ?)",
+                Statement.RETURN_GENERATED_KEYS
             );
-            ps.setString(1, name);
-            ps.setString(2, "Main");
-            ps.setInt(3, totalPcs);
-            ps.setString(4, status);
+            insLab.setString(1, name);
+            insLab.setString(2, "Main");
+            insLab.setInt(3, totalPcs);
+            insLab.setString(4, status);
+            insLab.executeUpdate();
 
-            boolean success = ps.executeUpdate() > 0;
-
-            if (success) {
-                System.out.println("✅ Lab added successfully: " + name);
-                response.getWriter().write(
-                    "{\"success\":true,\"message\":\"Lab added successfully\"}"
-                );
-            } else {
-                response.getWriter().write(
-                    "{\"success\":false,\"message\":\"Failed to add lab\"}"
-                );
+            ResultSet keys = insLab.getGeneratedKeys();
+            if (!keys.next()) {
+                out.print("{\"success\":false,\"message\":\"Failed to retrieve new lab ID\"}");
+                return;
             }
+            long newLabId = keys.getLong(1);
 
-        } catch (Exception e) {
-            System.out.println("❌ Add lab error: " + e.getMessage());
-            e.printStackTrace();
-            response.getWriter().write(
-                "{\"success\":false,\"message\":\"" + e.getMessage() + "\"}"
+            PreparedStatement insSeat = conn.prepareStatement(
+                "INSERT INTO seats (lab_id, seat_number, is_available) VALUES (?, ?, 1)"
             );
+            for (int i = 1; i <= totalPcs; i++) {
+                insSeat.setLong(1, newLabId);
+                insSeat.setString(2, String.format("PC-%02d", i));
+                insSeat.addBatch();
+            }
+            insSeat.executeBatch();
+
+            out.print("{\"success\":true,\"message\":\"Lab added successfully\"}");
         }
     }
 
-    /*
-     * Updates a lab's status in the database.
-     * Expects JSON: { "id": "3", "status": "Maintenance" }
-     */
-    private void handleUpdateLab(String body,
-                                  HttpServletResponse response)
-            throws IOException {
-
-        String idStr  = extractJsonNumber(body, "id");
-        String status = extractJson(body, "status");
-
-        System.out.println("🔄 Updating lab ID=" + idStr + " status=" + status);
+    private void handleUpdate(String body, PrintWriter out) throws Exception {
+        String idStr  = extractStr(body, "id");
+        String status = extractStr(body, "status");
 
         if (idStr.isEmpty() || status.isEmpty()) {
-            response.getWriter().write(
-                "{\"success\":false,\"message\":\"Lab ID and status are required\"}"
-            );
+            out.print("{\"success\":false,\"message\":\"id and status are required\"}");
             return;
         }
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-
             PreparedStatement ps = conn.prepareStatement(
-                "UPDATE labs SET status = ? WHERE ID = ?"
+                "UPDATE labs SET status = ? WHERE id = ?"
             );
             ps.setString(1, status);
-            ps.setInt(2, Integer.parseInt(idStr.trim()));
-
-            boolean success = ps.executeUpdate() > 0;
-
-            if (success) {
-                System.out.println("✅ Lab status updated: ID=" + idStr + " → " + status);
-                response.getWriter().write(
-                    "{\"success\":true,\"message\":\"Lab status updated\"}"
-                );
-            } else {
-                response.getWriter().write(
-                    "{\"success\":false,\"message\":\"Lab not found\"}"
-                );
-            }
-
-        } catch (Exception e) {
-            System.out.println("❌ Update lab error: " + e.getMessage());
-            e.printStackTrace();
-            response.getWriter().write(
-                "{\"success\":false,\"message\":\"" + e.getMessage() + "\"}"
-            );
+            ps.setLong(2, Long.parseLong(idStr));
+            int rows = ps.executeUpdate();
+            out.print(rows > 0
+                ? "{\"success\":true}"
+                : "{\"success\":false,\"message\":\"Lab not found\"}");
         }
     }
 
     @Override
-    protected void doOptions(HttpServletRequest req,
-                              HttpServletResponse res)
+    protected void doOptions(HttpServletRequest req, HttpServletResponse res)
             throws IOException {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type");
         res.setStatus(200);
     }
 
-    /* Extracts a string value from JSON */
-    private String extractJson(String json, String key) {
-        String search = "\"" + key + "\"";
-        int idx = json.indexOf(search);
-        if (idx == -1) return "";
-        int colon = json.indexOf(":", idx);
-        int start = json.indexOf("\"", colon) + 1;
-        int end   = json.indexOf("\"", start);
-        if (start <= 0 || end <= 0) return "";
-        return json.substring(start, end);
+    private String extractStr(String json, String key) {
+        try {
+            String pattern = "\"" + key + "\"";
+            int idx   = json.indexOf(pattern);
+            if (idx < 0) return "";
+            int colon = json.indexOf(":", idx + pattern.length());
+            if (colon < 0) return "";
+            int afterColon = colon + 1;
+            while (afterColon < json.length() && json.charAt(afterColon) == ' ') afterColon++;
+            if (afterColon >= json.length()) return "";
+            if (json.charAt(afterColon) == '"') {
+                int start = afterColon + 1;
+                int end   = json.indexOf("\"", start);
+                return end < 0 ? "" : json.substring(start, end);
+            } else {
+                int end = json.indexOf(",", afterColon);
+                if (end < 0) end = json.indexOf("}", afterColon);
+                return end < 0 ? "" : json.substring(afterColon, end).trim();
+            }
+        } catch (Exception e) { return ""; }
     }
 
-    /* Extracts a number value from JSON */
-    private String extractJsonNumber(String json, String key) {
-        String search = "\"" + key + "\"";
-        int idx = json.indexOf(search);
-        if (idx == -1) return "";
-        int colon = json.indexOf(":", idx) + 1;
-        StringBuilder num = new StringBuilder();
-        for (int i = colon; i < json.length(); i++) {
-            char c = json.charAt(i);
-            if (Character.isDigit(c)) num.append(c);
-            else if (num.length() > 0) break;
-        }
-        return num.toString();
+    private int extractInt(String json, String key) {
+        String val = extractStr(json, key);
+        try { return Integer.parseInt(val.trim()); } catch (Exception e) { return 0; }
     }
 
-    private String safe(String s) {
-        return s == null ? "" : s.replace("\"", "'");
+    private String esc(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "");
     }
 }
