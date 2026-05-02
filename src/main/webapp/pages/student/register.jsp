@@ -1,9 +1,3 @@
-<%-- 
-    Document   : register
-    Created on : 16 Mar 2026, 13:44:36
-    Author     : ICTS
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,11 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Register – Enterprise Booking System</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="../../css/styles.css"/>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styles.css"/>
   <style>
     body { display: flex; flex-direction: column; }
 
-    /* LEFT — deep blue gradient, unique to register */
     .left-panel {
       background: linear-gradient(145deg, #0F4C81 0%, #1e6fb5 50%, #2563EB 100%);
     }
@@ -37,7 +30,6 @@
 
     .right-panel { background: var(--bg); }
 
-    /* Progress */
     .progress { display: flex; align-items: center; margin-bottom: 28px; }
     .ps { display: flex; align-items: center; gap: 6px; }
     .pn {
@@ -47,14 +39,13 @@
       background: var(--border); color: var(--muted);
       transition: all 0.3s; flex-shrink: 0;
     }
-    .ps.on   .pn { background: var(--blue);    color: white; box-shadow: 0 0 0 3px var(--blue-light); }
+    .ps.on .pn { background: var(--blue); color: white; box-shadow: 0 0 0 3px var(--blue-light); }
     .ps.done .pn { background: var(--success); color: white; }
     .pl { font-size: 12px; font-weight: 600; color: var(--muted); }
     .ps.on .pl, .ps.done .pl { color: var(--text); }
     .pline { flex:1; height:2px; background:var(--border); margin:0 8px; border-radius:2px; transition:background 0.3s; }
     .pline.done { background: var(--success); }
 
-    /* Role chip — only Student shown, pre-selected */
     .role-display {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 10px 18px; border-radius: 10px;
@@ -63,7 +54,6 @@
       margin-bottom: 18px;
     }
 
-    /* Password strength */
     .pw-bars { display: flex; gap: 4px; margin-top: 6px; }
     .pb { flex:1; height:4px; background:var(--border); border-radius:2px; transition:background 0.3s; }
     .pb.w { background: var(--error); }
@@ -71,14 +61,12 @@
     .pb.s { background: var(--success); }
     .pw-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-    /* Checkbox */
     .check-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
     .check-row input[type=checkbox] { accent-color: var(--blue); margin-top: 2px; width:16px; height:16px; flex-shrink:0; cursor:pointer; }
     .check-row span { font-size: 13px; color: var(--muted); line-height: 1.5; }
     .check-row a { color: var(--blue); font-weight: 700; text-decoration: none; }
     .check-row a:hover { text-decoration: underline; }
 
-    /* OTP */
     .otp-email { font-size: 14px; color: var(--muted); margin-bottom: 22px; }
     .otp-email strong { color: var(--text); }
     .otp-row { display: flex; gap: 8px; margin-bottom: 16px; }
@@ -88,9 +76,9 @@
       font-family:inherit; color:var(--text); background:var(--card); outline:none;
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
-    .ob:focus  { border-color: var(--blue);    box-shadow: 0 0 0 3px var(--blue-light); }
-    .ob.filled { border-color: var(--blue);    background: var(--blue-light); }
-    .ob.e      { border-color: var(--error);   background: #FEF2F2; }
+    .ob:focus  { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-light); }
+    .ob.filled { border-color: var(--blue); background: var(--blue-light); }
+    .ob.e      { border-color: var(--error); background: #FEF2F2; }
     .ob.s      { border-color: var(--success); background: #F0FDF4; }
 
     .otp-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
@@ -103,15 +91,25 @@
     .bottom-link { text-align:center; margin-top:18px; font-size:14px; color:var(--muted); }
     .bottom-link a { color:var(--blue); font-weight:700; text-decoration:none; }
     .bottom-link a:hover { text-decoration: underline; }
+
+    footer {
+      background: white !important;
+      color: #666 !important;
+    }
+    footer a {
+      color: var(--blue) !important;
+    }
+    footer a:hover {
+      color: var(--blue-hover) !important;
+    }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-  <a href="../../index.jsp" class="nav-brand">
+  <a href="${pageContext.request.contextPath}/test-index.html" class="nav-brand">
     <div class="logo-img-wrap">
-      <img src="../../assets/logo.png" alt="Logo"
+      <img src="${pageContext.request.contextPath}/assets/logo.jpg" alt="Logo"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
       <div class="logo-fallback" style="display:none;">
         <svg viewBox="0 0 24 24">
@@ -126,15 +124,14 @@
     </div>
   </a>
   <div class="nav-links">
-    <a href="../../index.jsp" class="nav-a">Home</a>
-    <a href="login.jsp"       class="nav-a">Sign In</a>
-    <a href="register.jsp"    class="nav-a active cta">Register</a>
+    <a href="${pageContext.request.contextPath}/index.jsp" class="nav-a">Home</a>
+    <a href="${pageContext.request.contextPath}/pages/student/login.jsp" class="nav-a">Sign In</a>
+    <a href="${pageContext.request.contextPath}/pages/student/register.jsp" class="nav-a active cta">Register</a>
   </div>
 </nav>
 
 <div class="split-page">
 
-  <!-- LEFT -->
   <div class="left-panel">
     <div class="dc dc1"></div>
     <div class="dc dc2"></div>
@@ -150,7 +147,6 @@
     </ul>
   </div>
 
-  <!-- RIGHT -->
   <div class="right-panel">
     <div class="form-box">
 
@@ -162,30 +158,28 @@
         <div class="ps" id="ps3"><div class="pn">✓</div><span class="pl">Done</span></div>
       </div>
 
-      <!-- STEP 1 -->
       <div id="step1">
         <div class="form-title">Student Registration</div>
-        <p class="form-sub">Already registered? <a href="login.jsp">Sign in here</a></p>
+        <p class="form-sub">Already registered? <a href="${pageContext.request.contextPath}/pages/student/login.jsp">Sign in here</a></p>
 
         <div id="toast1" class="toast"></div>
 
-        <!-- Role is fixed as Student on this page -->
-        <div class="role-display">🎓 Registering as Student</div>
+        <div class="role-display">🎓 Registering as a Student</div>
 
         <div class="field">
-          <label for="uid">Student ID</label>
+          <label for="uid">Student Number</label>
           <div class="iw">
             <span class="ii">🪪</span>
-            <input type="text" id="uid" placeholder="e.g. STU2024001"/>
+            <input type="text" id="uid" placeholder="e.g.201234567"/>
           </div>
-          <div class="fmsg" id="uid-err">Student ID is required.</div>
+          <div class="fmsg" id="uid-err">Student Number is required.</div>
         </div>
 
         <div class="field">
           <label for="email">Email Address</label>
           <div class="iw">
             <span class="ii">✉️</span>
-            <input type="email" id="email" placeholder="you@example.com"/>
+            <input type="email" id="email" placeholder="200000000@ump.ac.za"/>
           </div>
           <div class="fmsg" id="email-err">Please enter a valid email address.</div>
         </div>
@@ -222,10 +216,9 @@
         <div class="fmsg" id="terms-err" style="margin-bottom:10px;">You must accept the terms to continue.</div>
 
         <button class="btn-main" id="regBtn" onclick="doRegister()">Create Account →</button>
-        <div class="bottom-link">Already have an account? <a href="login.jsp">Sign in</a></div>
+        <div class="bottom-link">Already have an account? <a href="${pageContext.request.contextPath}/pages/student/login.jsp">Sign in</a></div>
       </div>
 
-      <!-- STEP 2: OTP -->
       <div id="step2" style="display:none;">
         <div class="form-title">Verify Your Email 📧</div>
         <div class="form-sub">Enter the 6-digit code sent to your email</div>
@@ -257,14 +250,14 @@
 
 <footer>
   © 2026 Enterprise Booking System &nbsp;·&nbsp;
-  <a href="../../index.jsp">Home</a>
+  <a href="${pageContext.request.contextPath}/index.jsp">Home</a>
   <a href="#">Privacy Policy</a>
   <a href="#">Support</a>
 </footer>
 
 <script>
-  const role = 'student';
-  let otp = '', timerInt = null, timerSec = 30;
+  const CTX = '${pageContext.request.contextPath}';
+  let timerInt = null, timerSec = 30;
 
   function tpw(id, btn) {
     const el = document.getElementById(id);
@@ -281,7 +274,8 @@
 
   function showToast(id, msg, type) {
     const t = document.getElementById(id);
-    t.textContent = msg; t.className = 'toast ' + type;
+    t.textContent = msg;
+    t.className = 'toast ' + type;
   }
 
   function strengthCheck(pw) {
@@ -292,10 +286,10 @@
     if (/[^A-Za-z0-9]/.test(pw)) sc++;
     const cls = sc <= 1 ? 'w' : sc <= 2 ? 'm' : 's';
     ['b1','b2','b3','b4'].forEach((b,i) => {
-      document.getElementById(b).className = 'pb' + (i < sc ? ' '+cls : '');
+      document.getElementById(b).className = 'pb' + (i < sc ? ' ' + cls : '');
     });
     document.getElementById('pwlbl').textContent =
-      pw.length ? (['','Weak','Fair','Good','Strong'][sc]||'Weak') : 'Enter a password';
+      pw.length ? (['','Weak','Fair','Good','Strong'][sc] || 'Weak') : 'Enter a password';
   }
 
   function matchCheck() {
@@ -308,9 +302,9 @@
 
   function setStep(n) {
     for (let i = 1; i <= 3; i++) {
-      const ps = document.getElementById('ps'+i);
+      const ps = document.getElementById('ps' + i);
       ps.classList.remove('on','done');
-      if (i < n)        ps.classList.add('done');
+      if (i < n) ps.classList.add('done');
       else if (i === n) ps.classList.add('on');
     }
     document.getElementById('pl1').classList.toggle('done', n > 1);
@@ -318,24 +312,27 @@
   }
 
   function om(i) {
-    const box = document.getElementById('o'+i);
-    box.value = box.value.replace(/\D/,'');
+    const box = document.getElementById('o' + i);
+    box.value = box.value.replace(/\D/, '');
     box.classList.toggle('filled', !!box.value);
-    if (box.value && i < 5) document.getElementById('o'+(i+1)).focus();
+    if (box.value && i < 5) document.getElementById('o' + (i + 1)).focus();
   }
 
   function ob2(e, i) {
-    if (e.key === 'Backspace' && !document.getElementById('o'+i).value && i > 0)
-      document.getElementById('o'+(i-1)).focus();
+    if (e.key === 'Backspace' && !document.getElementById('o' + i).value && i > 0) {
+      document.getElementById('o' + (i - 1)).focus();
+    }
   }
 
   function startTimer() {
-    timerSec = 30; clearInterval(timerInt);
+    timerSec = 30;
+    clearInterval(timerInt);
     const tw = document.getElementById('timerWrap');
     const rb = document.getElementById('resendBtn');
     if (tw) tw.style.display = 'block';
     if (rb) rb.classList.remove('show');
     document.getElementById('timerVal').textContent = timerSec;
+
     timerInt = setInterval(() => {
       timerSec--;
       const tv = document.getElementById('timerVal');
@@ -348,15 +345,34 @@
     }, 1000);
   }
 
-  function resend() {
-    otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('%c[DEMO OTP] ' + otp, 'color:#3B82F6;font-weight:bold;font-size:14px');
-    [0,1,2,3,4,5].forEach(i => { const b = document.getElementById('o'+i); b.value=''; b.className='ob'; });
-    showToast('toast2','📨 New code sent! (Demo: check browser console)','inf');
-    startTimer();
+  async function resend() {
+    const email = document.getElementById('email').value.trim();
+    const uid   = document.getElementById('uid').value.trim();
+    [0,1,2,3,4,5].forEach(i => {
+      const b = document.getElementById('o' + i);
+      b.value = '';
+      b.className = 'ob';
+    });
+
+    try {
+      const response = await fetch(CTX + '/api/auth/register/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, studentNo: uid })
+      });
+
+      if (response.ok) {
+        showToast('toast2', '📨 New code sent! (Check NetBeans console)', 'inf');
+        startTimer();
+      } else {
+        showToast('toast2', '❌ Failed to resend code.', 'err');
+      }
+    } catch (error) {
+      showToast('toast2', '❌ Network error.', 'err');
+    }
   }
 
-  function doRegister() {
+  async function doRegister() {
     const uid   = document.getElementById('uid').value.trim();
     const email = document.getElementById('email').value.trim();
     const pw    = document.getElementById('pw').value;
@@ -364,61 +380,97 @@
     const terms = document.getElementById('terms').checked;
     let ok = true;
 
-    if (!uid)            { setErr('uid',  'uid-err',   true); ok=false; } else setErr('uid',  'uid-err',   false);
-    if (!isEmail(email)) { setErr('email','email-err', true); ok=false; } else setErr('email','email-err', false);
-    if (pw.length < 8)   { setErr('pw',  'pw-err',    true); ok=false; } else setErr('pw',  'pw-err',    false);
-    if (pw !== cpw)      { setErr('cpw', 'cpw-err',   true); ok=false; } else setErr('cpw', 'cpw-err',   false);
-    if (!terms) { document.getElementById('terms-err').classList.add('show');    ok=false; }
-    else          document.getElementById('terms-err').classList.remove('show');
+    if (!uid)            { setErr('uid', 'uid-err', true); ok = false; } else setErr('uid', 'uid-err', false);
+    if (!isEmail(email)) { setErr('email', 'email-err', true); ok = false; } else setErr('email', 'email-err', false);
+    if (pw.length < 8)   { setErr('pw', 'pw-err', true); ok = false; } else setErr('pw', 'pw-err', false);
+    if (pw !== cpw)      { setErr('cpw', 'cpw-err', true); ok = false; } else setErr('cpw', 'cpw-err', false);
+
+    if (!terms) {
+      document.getElementById('terms-err').classList.add('show');
+      ok = false;
+    } else {
+      document.getElementById('terms-err').classList.remove('show');
+    }
+
     if (!ok) return;
 
     const btn = document.getElementById('regBtn');
-    btn.disabled = true; btn.textContent = 'Sending code…';
+    btn.disabled = true;
+    btn.textContent = 'Checking details…';
 
-    /* ── Replace with fetch('/EnterpriseBookingSystem/RegisterServlet', ...) when backend is ready ── */
-    otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log('%c[DEMO OTP] ' + otp, 'color:#3B82F6;font-weight:bold;font-size:16px');
+    try {
+      const response = await fetch(CTX + '/api/auth/register/init', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, studentNo: uid })
+      });
 
-    setTimeout(() => {
-      document.getElementById('step1').style.display = 'none';
-      document.getElementById('step2').style.display = 'block';
-      document.getElementById('otp-email-show').textContent = email;
-      showToast('toast2','📨 Code sent! (Demo: check browser console)','inf');
-      setStep(2); startTimer();
-      document.getElementById('o0').focus();
-      btn.disabled = false; btn.textContent = 'Create Account →';
-    }, 700);
-    /* ── End demo block ── */
+      if (response.ok) {
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+        document.getElementById('otp-email-show').textContent = email;
+        showToast('toast2', '📨 Code sent! (Check NetBeans console)', 'inf');
+        setStep(2);
+        startTimer();
+        document.getElementById('o0').focus();
+      } else {
+        const data = await response.json();
+        showToast('toast1', '❌ ' + (data.error || 'Registration failed'), 'err');
+      }
+    } catch (error) {
+      showToast('toast1', '❌ Network error. Is GlassFish running?', 'err');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Create Account →';
   }
 
-  function doVerify() {
-    const entered = [0,1,2,3,4,5].map(i => document.getElementById('o'+i).value).join('');
-    if (entered.length < 6) { showToast('toast2','⚠️ Please enter all 6 digits.','err'); return; }
+  async function doVerify() {
+    const enteredOtp = [0,1,2,3,4,5].map(i => document.getElementById('o' + i).value).join('');
+    if (enteredOtp.length < 6) {
+      showToast('toast2', '⚠️ Please enter all 6 digits.', 'err');
+      return;
+    }
+
+    const uid   = document.getElementById('uid').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const pw    = document.getElementById('pw').value;
 
     const btn = document.getElementById('verifyBtn');
-    btn.disabled = true; btn.textContent = 'Verifying…';
+    btn.disabled = true;
+    btn.textContent = 'Saving to Database…';
 
-    setTimeout(() => {
-      if (entered === otp) {
+    try {
+      const response = await fetch(CTX + '/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentNo: uid,
+          fullName: 'Student ' + uid,
+          email: email,
+          password: pw,
+          otpCode: enteredOtp
+        })
+      });
+
+      if (response.status === 201) {
         clearInterval(timerInt);
-        const users = JSON.parse(localStorage.getItem('ebs_users') || '[]');
-        users.push({
-          email:    document.getElementById('email').value.trim(),
-          password: document.getElementById('pw').value,
-          id:       document.getElementById('uid').value.trim(),
-          role:     'student'
-        });
-        localStorage.setItem('ebs_users', JSON.stringify(users));
-        [0,1,2,3,4,5].forEach(i => document.getElementById('o'+i).classList.add('s'));
-        showToast('toast2','✅ Email verified! Taking you to Sign In…','ok');
+        [0,1,2,3,4,5].forEach(i => document.getElementById('o' + i).classList.add('s'));
+        showToast('toast2', '✅ Registered successfully! Redirecting…', 'ok');
         setStep(3);
-        setTimeout(() => window.location.href = 'login.jsp', 1500);
+        setTimeout(() => window.location.href = CTX + '/pages/student/login.jsp', 1500);
       } else {
-        [0,1,2,3,4,5].forEach(i => document.getElementById('o'+i).classList.add('e'));
-        showToast('toast2','❌ Incorrect code. Please try again.','err');
-        btn.disabled = false; btn.textContent = 'Verify & Continue';
+        const data = await response.json();
+        [0,1,2,3,4,5].forEach(i => document.getElementById('o' + i).classList.add('e'));
+        showToast('toast2', '❌ ' + (data.error || 'Verification failed'), 'err');
+        btn.disabled = false;
+        btn.textContent = 'Verify & Continue';
       }
-    }, 600);
+    } catch (error) {
+      showToast('toast2', '❌ Network error.', 'err');
+      btn.disabled = false;
+      btn.textContent = 'Verify & Continue';
+    }
   }
 
   function goBack() {

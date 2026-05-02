@@ -12,7 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lecturer Register – Enterprise Booking System</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="../../css/styles.css"/>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styles.css"/>
   <style>
     body { display: flex; flex-direction: column; }
 
@@ -109,7 +109,7 @@
 
 <!-- NAV -->
 <nav>
-  <a href="../../index.jsp" class="nav-brand">
+  <a href="../../test-index.html" class="nav-brand">
     <div class="logo-img-wrap">
       <img src="../../assets/logo.png" alt="Logo"
            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>

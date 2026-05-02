@@ -163,10 +163,11 @@
   document.getElementById('email').addEventListener('input', function(){ if(isEmail(this.value)) setErr('email','email-err',false); });
   document.getElementById('pw').addEventListener('input',    function(){ if(this.value) setErr('pw','pw-err',false); });
 
-  function doLogin() {
+  async function doLogin() {
     const email = document.getElementById('email').value.trim();
     const pw    = document.getElementById('pw').value;
     let ok = true;
+    
     if (!isEmail(email)) { setErr('email','email-err',true); ok=false; } else setErr('email','email-err',false);
     if (!pw)             { setErr('pw','pw-err',true);       ok=false; } else setErr('pw','pw-err',false);
     if (!ok) return;
@@ -174,23 +175,39 @@
     const btn = document.getElementById('loginBtn');
     btn.disabled = true; btn.textContent = 'Signing in…';
 
-    /* ── Replace with fetch('/EnterpriseBookingSystem/LoginServlet', ...) when backend is ready ── */
-    setTimeout(() => {
-      const users = JSON.parse(localStorage.getItem('ebs_users') || '[]');
-      const match = users.find(u => u.email === email && u.password === pw && u.role === 'student');
-      if (match) {
+    try {
+      // 1. Send the login request to your real GlassFish backend
+      const response = await fetch('/EnterpriseBookingSystem/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: pw })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // 2. Save the secure JWT token to the browser so the dashboard can use it later
+        localStorage.setItem('jwt_token', data.token);
+        
         showToast('✅ Login successful! Redirecting…', 'ok');
-        setTimeout(() => window.location.href = '../../index.jsp', 1200);
+        
+        // 3. Redirect to the Student Dashboard using an absolute path
+        setTimeout(() => {
+          window.location.href = '/EnterpriseBookingSystem/student/dashboard.jsp';
+        }, 1200);
+        
       } else {
-        showToast('❌ Incorrect email or password.', 'err');
+        // The backend rejected the password or email
+        showToast('❌ ' + data.error, 'err');
         btn.disabled = false; btn.textContent = 'Sign In';
       }
-    }, 700);
-    /* ── End demo block ── */
+    } catch (error) {
+      showToast('❌ Network error. Is the GlassFish server running?', 'err');
+      btn.disabled = false; btn.textContent = 'Sign In';
+    }
   }
 
   document.addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
 </script>
 </body>
 </html>
-

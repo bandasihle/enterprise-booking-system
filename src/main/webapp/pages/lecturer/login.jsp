@@ -12,7 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lecturer Login – Enterprise Booking System</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="../../css/styles.css"/>
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styles.css"/>
   <style>
     body { display: flex; flex-direction: column; }
 
@@ -185,19 +185,21 @@
     const btn = document.getElementById('loginBtn');
     btn.disabled = true; btn.textContent = 'Signing in…';
 
-    /* ── Replace with fetch('/EnterpriseBookingSystem/LoginServlet', ...) when backend is ready ── */
+//replaced
     setTimeout(() => {
-      const users = JSON.parse(localStorage.getItem('ebs_users') || '[]');
-      const match = users.find(u => u.email === email && u.password === pw && u.role === 'lecturer');
-      if (match) {
-        showToast('✅ Login successful! Redirecting…', 'ok');
-        setTimeout(() => window.location.href = '../../index.jsp', 1200);
-      } else {
-        showToast('❌ Incorrect email or password.', 'err');
-        btn.disabled = false; btn.textContent = 'Sign In';
-      }
-    }, 700);
-    /* ── End demo block ── */
+    const btn = document.getElementById('loginBtn');
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '${pageContext.request.contextPath}/login';
+    
+    // Add email/pw as hidden inputs to trigger your LoginServlet.java
+    form.innerHTML = `
+        <input type="hidden" name="email" value="${email}">
+        <input type="hidden" name="password" value="${pw}">
+    `;
+    document.body.appendChild(form);
+    form.submit();
+}, 700);
   }
 
   document.addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });

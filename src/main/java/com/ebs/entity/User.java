@@ -1,5 +1,3 @@
-
-
 package com.ebs.entity;
 
 import jakarta.persistence.*;
@@ -8,6 +6,9 @@ import jakarta.validation.constraints.*;
 /**
  * Base User entity - inherited by Student, Lecturer, Admin
  * Uses JPA JOINED inheritance strategy for clean table separation.
+ *
+ * FIX: Added is_suspended and suspended_until column mappings.
+ *      Without these, AuthService can never read suspension state from the DB.
  */
 @Entity
 @Table(name = "users")
@@ -30,10 +31,18 @@ public abstract class User {
 
     @NotBlank
     @Column(nullable = false)
-    private String password; // Store BCrypt hash - never plain text
+    private String password;
 
     @Column(name = "is_banned", nullable = false)
     private boolean banned = false;
+
+    // ── SUSPENSION FIELDS (were in DB but unmapped — caused the bug) ──────────
+    @Column(name = "is_suspended", nullable = false)
+    private boolean suspended = false;
+
+    @Column(name = "suspended_until")
+    private java.time.LocalDateTime suspendedUntil;
+    // ─────────────────────────────────────────────────────────────────────────
 
     @Column(name = "cancellation_count", nullable = false)
     private int cancellationCount = 0;
@@ -41,7 +50,12 @@ public abstract class User {
     @Column(name = "ban_expiry")
     private java.time.LocalDateTime banExpiry;
 
-    // Getters and Setters
+    @Column(name = "role", insertable = false, updatable = false)
+    private String role;
+
+
+    // ── Getters & Setters ─────────────────────────────────────────────────────
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -57,9 +71,17 @@ public abstract class User {
     public boolean isBanned() { return banned; }
     public void setBanned(boolean banned) { this.banned = banned; }
 
+    public boolean isSuspended() { return suspended; }
+    public void setSuspended(boolean suspended) { this.suspended = suspended; }
+
+    public java.time.LocalDateTime getSuspendedUntil() { return suspendedUntil; }
+    public void setSuspendedUntil(java.time.LocalDateTime suspendedUntil) { this.suspendedUntil = suspendedUntil; }
+
     public int getCancellationCount() { return cancellationCount; }
     public void setCancellationCount(int cancellationCount) { this.cancellationCount = cancellationCount; }
 
     public java.time.LocalDateTime getBanExpiry() { return banExpiry; }
     public void setBanExpiry(java.time.LocalDateTime banExpiry) { this.banExpiry = banExpiry; }
+
+    public String getRole() { return role; }
 }
