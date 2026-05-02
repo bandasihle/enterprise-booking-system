@@ -48,7 +48,7 @@ public class AuthService {
         generateAndSendOtp(email);
     }
 
-   @Transactional
+    @Transactional
     public void verifyOtpAndRegister(RegisterRequest request) throws Exception {
         try {
             OtpToken otpToken = em.createQuery(
@@ -62,24 +62,20 @@ public class AuthService {
             otpToken.setUsed(true);
             em.merge(otpToken);
 
-            // --- THE FIX: Route the user to the correct JPA Entity based on role ---
             if ("lecturer".equalsIgnoreCase(request.role())) {
                 Lecturer newLecturer = new Lecturer();
                 newLecturer.setFullName(request.fullName());
                 newLecturer.setEmail(request.email());
                 newLecturer.setPassword(request.password());
-                // The frontend passes the Staff ID inside the studentNo field
-                newLecturer.setStaffNumber(request.studentNo()); 
-                
-                em.persist(newLecturer); 
+                newLecturer.setStaffNumber(request.studentNo());
+                em.persist(newLecturer);
             } else {
                 Student newStudent = new Student();
                 newStudent.setFullName(request.fullName());
                 newStudent.setEmail(request.email());
                 newStudent.setPassword(request.password());
                 newStudent.setStudentNumber(request.studentNo());
-                
-                em.persist(newStudent); 
+                em.persist(newStudent);
             }
 
         } catch (NoResultException e) {
@@ -87,31 +83,62 @@ public class AuthService {
         }
     }
 
-   public String login(String email, String password) throws Exception {
+    /**
+     * Authenticates a user and returns a JWT token.
+     *
+     * FIX: Added suspension check. The original code only checked isBanned(),
+     *      allowing suspended users to log in freely. We also auto-lift
+     *      suspensions whose expiry timestamp has already passed.
+     */
+    @Transactional
+    public String login(String email, String password) throws Exception {
         try {
             User user = em.createQuery(
                     "SELECT u FROM User u WHERE u.email = :email", User.class)
                     .setParameter("email", email)
                     .getSingleResult();
 
+            // ── Check ban ──────────────────────────────────────────────────────
             if (user.isBanned()) {
-                // Keep this one specific so the user knows they are locked out
-                throw new Exception("Your account has been suspended. Please contact administration.");
+                throw new Exception("Your account has been banned. Please contact administration.");
             }
 
+            // ── Check suspension (auto-lift if the period has expired) ─────────
+            if (user.isSuspended()) {
+                LocalDateTime suspendedUntil = user.getSuspendedUntil();
+                if (suspendedUntil != null && LocalDateTime.now().isAfter(suspendedUntil)) {
+                    // Suspension has expired — lift it automatically
+                    user.setSuspended(false);
+                    user.setSuspendedUntil(null);
+                    em.merge(user);
+                } else {
+                    // Still within the suspension window — block login
+                    String until = (suspendedUntil != null)
+                            ? suspendedUntil.toString().replace("T", " ")
+                            : "further notice";
+                    throw new Exception(
+                            "Your account is suspended until " + until +
+                            ". Please contact administration if you believe this is an error.");
+                }
+            }
+            // ─────────────────────────────────────────────────────────────────
+
             if (!user.getPassword().equals(password)) {
-                // Standard, vague error for bad passwords
                 throw new Exception("Invalid email or password.");
             }
 
             return "mock-jwt-token-" + System.currentTimeMillis();
 
         } catch (NoResultException e) {
-            // The exact same vague error if the email doesn't exist at all
             throw new Exception("Invalid email or password.");
         }
     }
-    
+
+    /**
+     * FIX: Same suspension check applied here so the session-based
+     *      flow is also protected.
+     */
+    @Transactional
     public Long loginAndReturnUserId(String email, String password) throws Exception {
         try {
             User user = em.createQuery(
@@ -120,8 +147,24 @@ public class AuthService {
                     .getSingleResult();
 
             if (user.isBanned()) {
-                throw new Exception("User is banned.");
+                throw new Exception("Your account has been banned.");
             }
+
+            // ── Suspension check ───────────────────────────────────────────────
+            if (user.isSuspended()) {
+                LocalDateTime suspendedUntil = user.getSuspendedUntil();
+                if (suspendedUntil != null && LocalDateTime.now().isAfter(suspendedUntil)) {
+                    user.setSuspended(false);
+                    user.setSuspendedUntil(null);
+                    em.merge(user);
+                } else {
+                    String until = (suspendedUntil != null)
+                            ? suspendedUntil.toString().replace("T", " ")
+                            : "further notice";
+                    throw new Exception("Your account is suspended until " + until + ".");
+                }
+            }
+            // ─────────────────────────────────────────────────────────────────
 
             if (!user.getPassword().equals(password)) {
                 throw new Exception("Invalid password.");
@@ -155,7 +198,7 @@ public class AuthService {
                      .setParameter("email", email)
                      .getSingleResult();
         } catch (NoResultException e) {
-            return null; // Return null if the user isn't found
+            return null;
         }
     }
 }
