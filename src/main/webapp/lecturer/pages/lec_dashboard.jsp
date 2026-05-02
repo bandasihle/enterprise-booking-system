@@ -211,7 +211,20 @@
           <div class="lab-card" data-category="${cardType}"
                data-search="${fn:toLowerCase(lab.labName)} ${fn:toLowerCase(lab.building)}">
             
-            <img src="../images/${isComputer ? 'lab.jpg' : 'LectureHall.jpg'}" 
+            <%--
+              Real campus photos — computer labs cycle through 4 shots,
+              seminar/other venues cycle through 2, keyed on lab.id so
+              each venue always gets the same photo.
+            --%>
+            <c:choose>
+              <c:when test="${isComputer}">
+                <c:set var="imgFile" value="${['lab-wide.jpeg','lab-color.jpeg','lab-evening.jpeg','lab-dark.jpeg'][lab.id % 4]}"/>
+              </c:when>
+              <c:otherwise>
+                <c:set var="imgFile" value="${['seminar.jpeg','lecture-hall.jpeg'][lab.id % 2]}"/>
+              </c:otherwise>
+            </c:choose>
+            <img src="../images/${imgFile}"
                  alt="${lab.labName}" class="lab-image"
                  onerror="this.src='../images/logooo.jpeg'"/>
 

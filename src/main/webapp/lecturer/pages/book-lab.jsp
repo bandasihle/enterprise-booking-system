@@ -58,6 +58,52 @@
         border-radius: 8px; font-family: inherit; margin-top: 5px;
     }
 
+
+    /* ── Lab preview image in sidebar ─────────────────────── */
+    .lab-preview-wrap {
+        width: 100%;
+        height: 160px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 16px;
+        position: relative;
+        background: #e2e8f0;
+    }
+
+    .lab-preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        transition: opacity 0.3s ease;
+    }
+
+    .lab-preview-label {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        background: linear-gradient(transparent, rgba(6,95,70,0.75));
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 18px 10px 8px;
+        letter-spacing: 0.4px;
+    }
+
+    .lab-preview-placeholder {
+        width: 100%;
+        height: 160px;
+        border-radius: 10px;
+        background: #f1f5f9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 13px;
+        margin-bottom: 16px;
+        gap: 6px;
+    }
     @media (max-width: 900px) {
         .booking-container { grid-template-columns: 1fr; }
     }
@@ -157,6 +203,12 @@
 
     <!-- RIGHT: THE "QUICK-LOOK" (Replaced duplicate full table) -->
     <div class="sidebar-panel">
+      <%-- Lab preview image — swaps via JS when a lab is selected --%>
+      <div id="labPreviewWrap" class="lab-preview-placeholder">
+        <span style="font-size:28px;">🏫</span>
+        <span>Select a lab to preview</span>
+      </div>
+
       <h3 style="margin-top:0; font-size: 1.1rem;">Upcoming Sessions</h3>
       <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 20px;">Your next 5 reservations</p>
       
@@ -204,6 +256,62 @@
 
   // Date Logic
   document.getElementById('date').min = new Date().toISOString().split('T')[0];
+
+  // ── Lab preview image switcher ────────────────────────────
+  (function () {
+    // Maps keywords in a lab name → image filename (all in /lecturer/images/)
+    // Computer labs get the 4 real lab photos; anything else gets seminar/lecture-hall
+    var computerImages = [
+      'lab-wide.jpeg',
+      'lab-color.jpeg',
+      'lab-evening.jpeg',
+      'lab-dark.jpeg'
+    ];
+    var seminarImages = [
+      'seminar.jpeg',
+      'lecture-hall.jpeg'
+    ];
+
+    // Resolve image for an option index + name
+    function resolveImage(idx, labName) {
+      var lower = labName.toLowerCase();
+      var isComputer = lower.indexOf('lab') >= 0 || lower.indexOf('lg') >= 0 || lower.indexOf('computer') >= 0;
+      if (isComputer) {
+        return computerImages[idx % computerImages.length];
+      }
+      return seminarImages[idx % seminarImages.length];
+    }
+
+    function updatePreview(selectEl) {
+      var wrap = document.getElementById('labPreviewWrap');
+      var selectedOpt = selectEl.options[selectEl.selectedIndex];
+
+      if (!selectEl.value) {
+        wrap.className = 'lab-preview-placeholder';
+        wrap.innerHTML = '<span style="font-size:28px;">🏫</span><span>Select a lab to preview</span>';
+        return;
+      }
+
+      // index within real options (skip the placeholder option at index 0)
+      var realIdx = selectEl.selectedIndex - 1;
+      var labName = selectedOpt.text;
+      var imgFile = resolveImage(realIdx, labName);
+      var ctx = '${pageContext.request.contextPath}';
+
+      wrap.className = 'lab-preview-wrap';
+      wrap.innerHTML =
+        '<img class="lab-preview-img" src="' + ctx + '/lecturer/images/' + imgFile + '"' +
+        '     alt="' + labName + '"' +
+        '     onerror="this.src=\'' + ctx + '/lecturer/images/logo.jpeg\'"/>' +
+        '<div class="lab-preview-label">' + labName + '</div>';
+    }
+
+    var labSel = document.getElementById('labId');
+    labSel.addEventListener('change', function () { updatePreview(this); });
+
+    // Pre-populate if a lab was already selected (e.g. arriving from dashboard with ?labId=)
+    if (labSel.value) { updatePreview(labSel); }
+  })();
 </script>
 </body>
 </html>
