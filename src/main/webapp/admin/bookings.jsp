@@ -73,18 +73,16 @@
     <section class="panel">
       <div class="panel-header">
         <h2>Booking Records</h2>
-        <button class="panel-btn" onclick="exportTable()">Export</button>
+        <%-- Export CSV: downloads all bookings (including hidden filtered rows) --%>
+        <button class="panel-btn" onclick="exportCSV()">Export CSV</button>
       </div>
       <div class="table-wrapper">
         <table id="bookingsTable">
           <thead>
             <tr>
-              <%-- FIX: Added "Type" column so admin can distinguish student bookings
-                         from lecturer lab blocks at a glance. --%>
               <th>Type</th>
               <th>Name</th>
               <th>Lab</th>
-              <%-- "Seat / Module" — seat number for students, module code for lecturers --%>
               <th>Seat / Module</th>
               <th>Date</th>
               <th>Time</th>
@@ -112,6 +110,9 @@
       return d.innerHTML;
     }
 
+    /* ── Keep a copy of all booking data for clean CSV export ── */
+    var allBookings = [];
+
     /* ── Build a coloured badge from raw status string ── */
     function statusBadge(rawStatus) {
       var s  = (rawStatus || '').toUpperCase();
@@ -137,12 +138,11 @@
           return r.json();
         })
         .then(function (data) {
-          var bookings = data.bookings || [];
+          allBookings = data.bookings || [];
           var approved = 0, pending = 0, cancelled = 0;
 
-          /* Tally stats across BOTH booking types */
-          for (var i = 0; i < bookings.length; i++) {
-            var s = (bookings[i].status || '').toUpperCase();
+          for (var i = 0; i < allBookings.length; i++) {
+            var s = (allBookings[i].status || '').toUpperCase();
             if (s === 'APPROVED' || s === 'CONFIRMED')  { approved++;  }
             else if (s === 'PENDING')                    { pending++;   }
             else                                         { cancelled++; }
@@ -154,7 +154,7 @@
 
           var tbody = document.getElementById('bookingsTableBody');
 
-          if (!bookings.length) {
+          if (!allBookings.length) {
             tbody.innerHTML =
               '<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:#888;">' +
               'No bookings found.</td></tr>';
@@ -162,15 +162,11 @@
           }
 
           var html = '';
-          for (var j = 0; j < bookings.length; j++) {
-            var b    = bookings[j];
+          for (var j = 0; j < allBookings.length; j++) {
+            var b    = allBookings[j];
             var type = b.booking_type || 'STUDENT';
             var sUp  = (b.status || '').toUpperCase();
 
-            /*
-             * Only student PENDING bookings get an Approve button.
-             * Lecturer blocks are managed through the lecturer portal.
-             */
             var actionBtn = (sUp === 'PENDING' && type === 'STUDENT')
               ? '<button class="table-btn" data-id="'   + b.id + '" data-action="approve">Approve</button>'
               : '<button class="table-btn secondary" data-id="' + b.id + '" data-type="' + type + '" data-action="view">View</button>';
@@ -188,7 +184,6 @@
           }
           tbody.innerHTML = html;
 
-          /* Delegate click handler for approve / view */
           tbody.addEventListener('click', function (e) {
             var btn = e.target.closest('[data-action]');
             if (!btn) return;
@@ -197,7 +192,7 @@
               fetch('../api/bookings/approve', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: '{"id":' + btn.dataset.id + '}'
+                body: '{\"id\":' + btn.dataset.id + '}'
               })
               .then(function (r) { return r.json(); })
               .then(function (res) {
@@ -209,13 +204,13 @@
             } else {
               var row = btn.closest('tr');
               alert(
-                'Type:   ' + row.cells[0].textContent.trim() + '\n' +
-                'Name:   ' + row.cells[1].textContent        + '\n' +
-                'Lab:    ' + row.cells[2].textContent        + '\n' +
-                'Seat/Mod: ' + row.cells[3].textContent      + '\n' +
-                'Date:   ' + row.cells[4].textContent        + '\n' +
-                'Time:   ' + row.cells[5].textContent        + '\n' +
-                'Status: ' + row.cells[6].textContent.trim()
+                'Type:     ' + row.cells[0].textContent.trim() + '\n' +
+                'Name:     ' + row.cells[1].textContent        + '\n' +
+                'Lab:      ' + row.cells[2].textContent        + '\n' +
+                'Seat/Mod: ' + row.cells[3].textContent        + '\n' +
+                'Date:     ' + row.cells[4].textContent        + '\n' +
+                'Time:     ' + row.cells[5].textContent        + '\n' +
+                'Status:   ' + row.cells[6].textContent.trim()
               );
             }
           });
@@ -236,20 +231,50 @@
       });
     };
 
-    /* ── CSV export ── */
-    window.exportTable = function () {
-      var rows  = document.querySelectorAll('#bookingsTable tr');
-      var lines = [];
-      rows.forEach(function (r) {
-        var cells = Array.from(r.querySelectorAll('th,td'))
-                         .map(function (c) { return '"' + c.textContent.trim().replace(/"/g, '""') + '"'; });
-        lines.push(cells.join(','));
-      });
-      var blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    /* ── CSV export — uses raw data array, not DOM, so it's always complete ── */
+    window.exportCSV = function () {
+      if (!allBookings.length) {
+        alert('No booking data to export.');
+        return;
+      }
+
+      var headers = ['Type','Name','Lab','Seat / Module','Date','Time','Status'];
+      var rows    = [headers];
+
+      for (var i = 0; i < allBookings.length; i++) {
+        var b    = allBookings[i];
+        var type = b.booking_type || 'STUDENT';
+        rows.push([
+          type,
+          b.user_name  || b.user_email || '',
+          b.lab_name   || '',
+          b.seat_label || '',
+          b.booking_date || '',
+          b.booking_time || '',
+          b.status || ''
+        ]);
+      }
+
+      var csv = rows.map(function (row) {
+        return row.map(function (cell) {
+          return '"' + String(cell).replace(/"/g, '""') + '"';
+        }).join(',');
+      }).join('\n');
+
+      /* Build a dated filename: bookings-2026-05-02.csv */
+      var today    = new Date();
+      var dateStr  = today.getFullYear() + '-'
+                   + String(today.getMonth() + 1).padStart(2, '0') + '-'
+                   + String(today.getDate()).padStart(2, '0');
+
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       var a    = document.createElement('a');
       a.href   = URL.createObjectURL(blob);
-      a.download = 'bookings-export.csv';
+      a.download = 'bookings-' + dateStr + '.csv';
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
     };
 
     document.addEventListener('DOMContentLoaded', loadBookings);

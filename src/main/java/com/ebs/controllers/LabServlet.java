@@ -129,11 +129,14 @@ public class LabServlet extends HttpServlet {
             long newLabId = keys.getLong(1);
 
             PreparedStatement insSeat = conn.prepareStatement(
-                "INSERT INTO seats (lab_id, seat_number, is_available) VALUES (?, ?, 1)"
+                "INSERT INTO seats (lab_id, seat_number, is_available) VALUES (?, ?, ?)"
             );
+            // If lab is added as Maintenance, create seats but mark them unavailable
+            int avail = "Maintenance".equals(status) ? 0 : 1;
             for (int i = 1; i <= totalPcs; i++) {
                 insSeat.setLong(1, newLabId);
                 insSeat.setString(2, String.format("PC-%02d", i));
+                insSeat.setInt(3, avail);
                 insSeat.addBatch();
             }
             insSeat.executeBatch();
@@ -142,25 +145,93 @@ public class LabServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Updates lab name, capacity, and/or status.
+     *
+     * - If status changes to Maintenance  → all seats locked (is_available = 0)
+     * - If status changes back to Active  → seats with no active booking are unlocked
+     * - If capacity increased             → extra PC seats are created
+     */
     private void handleUpdate(String body, PrintWriter out) throws Exception {
-        String idStr  = extractStr(body, "id");
-        String status = extractStr(body, "status");
+        String idStr    = extractStr(body, "id");
+        String name     = extractStr(body, "name");
+        String status   = extractStr(body, "status");
+        String totalStr = extractStr(body, "total_pcs");
 
         if (idStr.isEmpty() || status.isEmpty()) {
             out.print("{\"success\":false,\"message\":\"id and status are required\"}");
             return;
         }
 
+        long labId = Long.parseLong(idStr);
+
         try (Connection conn = DatabaseConnection.getConnection()) {
-            PreparedStatement ps = conn.prepareStatement(
-                "UPDATE labs SET status = ? WHERE id = ?"
-            );
-            ps.setString(1, status);
-            ps.setLong(2, Long.parseLong(idStr));
-            int rows = ps.executeUpdate();
-            out.print(rows > 0
-                ? "{\"success\":true}"
-                : "{\"success\":false,\"message\":\"Lab not found\"}");
+
+            // ── 1. Read current values ──────────────────────────────
+            PreparedStatement sel = conn.prepareStatement(
+                "SELECT lab_name, capacity, status FROM labs WHERE id = ?");
+            sel.setLong(1, labId);
+            ResultSet rs = sel.executeQuery();
+            if (!rs.next()) {
+                out.print("{\"success\":false,\"message\":\"Lab not found\"}");
+                return;
+            }
+            String oldName   = rs.getString("lab_name");
+            int    oldCap    = rs.getInt("capacity");
+            String oldStatus = rs.getString("status");
+
+            String newName   = name.isEmpty()     ? oldName : name;
+            int    newCap    = totalStr.isEmpty()  ? oldCap  : Math.max(1, Integer.parseInt(totalStr));
+
+            // ── 2. Update the lab record ────────────────────────────
+            PreparedStatement upd = conn.prepareStatement(
+                "UPDATE labs SET lab_name = ?, capacity = ?, status = ? WHERE id = ?");
+            upd.setString(1, newName);
+            upd.setInt   (2, newCap);
+            upd.setString(3, status);
+            upd.setLong  (4, labId);
+            upd.executeUpdate();
+
+            // ── 3. Add extra seats if capacity increased ────────────
+            if (newCap > oldCap) {
+                PreparedStatement ins = conn.prepareStatement(
+                    "INSERT INTO seats (lab_id, seat_number, is_available) VALUES (?, ?, ?)");
+                // New seats respect the target status
+                int avail = "Maintenance".equals(status) ? 0 : 1;
+                for (int i = oldCap + 1; i <= newCap; i++) {
+                    ins.setLong  (1, labId);
+                    ins.setString(2, String.format("PC-%02d", i));
+                    ins.setInt   (3, avail);
+                    ins.addBatch();
+                }
+                ins.executeBatch();
+            }
+
+            // ── 4. Lock / unlock seats based on status change ───────
+            boolean wasActive = "Active".equalsIgnoreCase(oldStatus);
+            boolean nowActive = "Active".equalsIgnoreCase(status);
+
+            if (!nowActive && wasActive) {
+                // Going into Maintenance → lock every seat
+                PreparedStatement lock = conn.prepareStatement(
+                    "UPDATE seats SET is_available = 0 WHERE lab_id = ?");
+                lock.setLong(1, labId);
+                lock.executeUpdate();
+
+            } else if (nowActive && !wasActive) {
+                // Coming back to Active → only unlock seats with no current booking
+                PreparedStatement unlock = conn.prepareStatement(
+                    "UPDATE seats SET is_available = 1 " +
+                    "WHERE lab_id = ? " +
+                    "AND id NOT IN (" +
+                    "  SELECT seat_id FROM bookings " +
+                    "  WHERE status IN ('CONFIRMED','PENDING') AND end_time > NOW()" +
+                    ")");
+                unlock.setLong(1, labId);
+                unlock.executeUpdate();
+            }
+
+            out.print("{\"success\":true}");
         }
     }
 

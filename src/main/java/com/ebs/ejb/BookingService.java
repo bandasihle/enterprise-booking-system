@@ -15,11 +15,8 @@ import java.time.LocalDateTime;
  *
  * Fixes applied:
  *  1. bookSeat()      — checks for active ban before allowing a booking
- *  2. cancelBooking() — triggers a 24-hour auto-ban when cancellationCount >= 3
- *
- * Note for Servlet callers: EJBs wrap checked and unchecked exceptions in
- * EJBException. BookingServlet and MyBookingsServlet unwrap getCause()
- * to read the real exception type (SecurityException, IllegalStateException).
+ *  2. bookSeat()      — rejects booking if the lab is under maintenance
+ *  3. cancelBooking() — triggers a 24-hour auto-ban when cancellationCount >= 3
  */
 @Stateless
 public class BookingService {
@@ -45,7 +42,8 @@ public class BookingService {
      * First transaction to commit wins; the second throws OptimisticLockException.
      *
      * @throws SecurityException     if the user is currently banned
-     * @throws IllegalStateException if the seat is already taken
+     * @throws IllegalStateException "SEAT_TAKEN"              if seat is already booked
+     * @throws IllegalStateException "LAB_UNDER_MAINTENANCE"   if the lab is not Active
      * @throws IllegalArgumentException if user or seat ID not found
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -68,11 +66,18 @@ public class BookingService {
         if (seat == null) {
             throw new IllegalArgumentException("Seat not found: " + seatId);
         }
+
+        // 3. Guard: refuse booking if the lab is under maintenance
+        Lab lab = seat.getLab();
+        if (lab == null || !"Active".equalsIgnoreCase(lab.getStatus())) {
+            throw new IllegalStateException("LAB_UNDER_MAINTENANCE");
+        }
+
         if (!seat.isAvailable()) {
             throw new IllegalStateException("SEAT_TAKEN");
         }
 
-        // 3. Create and persist booking
+        // 4. Create and persist booking
         seat.setAvailable(false);
 
         Booking booking = new Booking();
@@ -83,8 +88,8 @@ public class BookingService {
         booking.setStatus(Booking.Status.CONFIRMED);
         em.persist(booking);
 
-        // 4. Broadcast real-time seat update to all WebSocket clients
-        broadcaster.broadcastSeatUpdate(seat.getLab().getId(), seatId, false);
+        // 5. Broadcast real-time seat update to all WebSocket clients
+        broadcaster.broadcastSeatUpdate(lab.getId(), seatId, false);
 
         return booking;
     }
