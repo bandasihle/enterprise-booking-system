@@ -68,12 +68,13 @@
             <th>Role</th>
             <th>Status</th>
             <th>Suspended Until</th>
+            <th>Last Login</th>
           </tr>
         </thead>
 
         <tbody id="usersTableBody">
           <tr>
-            <td colspan="6" style="text-align:center;padding:1.5rem;color:#888;">
+            <td colspan="7" style="text-align:center;padding:1.5rem;color:#888;">
               Loading...
             </td>
           </tr>
@@ -113,7 +114,7 @@
 
         if (!users.length) {
           tbody.innerHTML =
-            '<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#888;">No users found.</td></tr>';
+            '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#888;">No users found.</td></tr>';
           return;
         }
 
@@ -145,6 +146,7 @@
             + '<td>' + esc(u.role) + '</td>'
             + '<td><span class="badge ' + statusClass + '">' + statusText + '</span></td>'
             + '<td>' + suspendedUntilCell + '</td>'
+            + '<td>—</td>'
             + '</tr>';
         });
 
@@ -153,7 +155,7 @@
       })
       .catch(function () {
         document.getElementById('usersTableBody').innerHTML =
-          '<tr><td colspan="6" style="text-align:center;color:red;">Error loading users</td></tr>';
+          '<tr><td colspan="7" style="text-align:center;color:red;">Error loading users</td></tr>';
       });
   }
 

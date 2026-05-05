@@ -26,8 +26,7 @@ public class LecturerBlockService {
      * Validates for time overlaps on the same lab before persisting.
      *
      * @throws IllegalArgumentException if lecturer or lab not found
-     * @throws IllegalStateException    "LAB_UNDER_MAINTENANCE" if lab is not Active
-     * @throws IllegalStateException    "LAB_ALREADY_BLOCKED"   on time conflict
+     * @throws IllegalStateException    with message "LAB_ALREADY_BLOCKED" on conflict
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public LecturerBlock createBlock(Long lecturerId, Long labId,
@@ -39,11 +38,6 @@ public class LecturerBlockService {
 
         Lab lab = em.find(Lab.class, labId);
         if (lab == null) throw new IllegalArgumentException("Lab not found: " + labId);
-
-        // Guard: refuse block if the lab is under maintenance
-        if (!"Active".equalsIgnoreCase(lab.getStatus())) {
-            throw new IllegalStateException("LAB_UNDER_MAINTENANCE");
-        }
 
         if (!startTime.isBefore(endTime))
             throw new IllegalArgumentException("Start time must be before end time.");
@@ -108,23 +102,26 @@ public class LecturerBlockService {
     }
 
     /**
-     * Returns only ACTIVE labs — maintenance labs are hidden from the booking form.
+     * Returns all labs — used to populate the building/lab dropdowns.
      */
     public List<Lab> getAllLabs() {
         return em.createQuery(
-                "SELECT l FROM Lab l WHERE l.status = 'Active' ORDER BY l.building, l.labName",
+                "SELECT l FROM Lab l ORDER BY l.building, l.labName",
                 Lab.class)
+                //.setParameter("id",  lecturerId) // This line is actually unnecessary for getAllLabs, removing in logic
                 .getResultList();
     }
 
     /**
      * Cancels a specific lab block by updating its status to 'CANCELLED'.
+     * This ensures the slot becomes available for others while keeping history.
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void cancelBlock(Long blockId) {
         LecturerBlock block = em.find(LecturerBlock.class, blockId);
         if (block != null) {
             block.setStatus("CANCELLED");
+            // JPA will automatically synchronize this change with MySQL at the end of the method.
         } else {
             throw new IllegalArgumentException("Booking not found with ID: " + blockId);
         }

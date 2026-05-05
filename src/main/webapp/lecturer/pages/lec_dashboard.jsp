@@ -7,186 +7,85 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lecturer Dashboard – EBS</title>
+  <%-- This file lives at: src/main/webapp/lecturer/pages/lec_dashboard.jsp --%>
+  <%-- CSS at:             src/main/webapp/lecturer/css/lecturer.css        --%>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/lecturer/css/lecturer.css">
-  
-  <style>
-    :root {
-        --primary-green: #065f46; /* Deep emerald */
-        --hover-white: rgba(255, 255, 255, 0.15);
-        --text-secondary: #64748b;
-        --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-    }
-
-    /* 1. Refined Navbar - Ghost Button Style */
-    .top-navbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem 2rem;
-        background-color: var(--primary-green);
-    }
-    
-    .nav-left-section { flex: 1; display: flex; align-items: center; }
-
-    .nav-menu {
-        display: flex;
-        gap: 8px;
-        flex: 2;
-        justify-content: center;
-    }
-
-    .nav-menu .primary-btn {
-        background: transparent;
-        border: 1px solid transparent;
-        color: rgba(255, 255, 255, 0.85);
-        font-weight: 500;
-        padding: 8px 16px;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-    }
-
-    .nav-menu .primary-btn:hover {
-        background: var(--hover-white);
-        color: #fff;
-    }
-
-    /* Active State for current page */
-    .nav-menu a[href*="dashboard"] {
-        background: var(--hover-white);
-        color: #fff;
-        border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .nav-right {
-        flex: 1;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 15px;
-    }
-
-    /* 2. Softer Stat Cards */
-    .stat-card {
-        background: #fff;
-        border: none !important;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: var(--card-shadow);
-        transition: transform 0.3s ease;
-    }
-
-    .stat-card:hover { transform: translateY(-2px); }
-
-    .stat-number { font-size: 2.5rem; font-weight: 800; color: var(--primary-green); }
-
-    .stat-label { 
-        color: var(--text-secondary); 
-        font-size: 0.9rem; 
-        text-transform: uppercase; 
-        letter-spacing: 0.5px; 
-    }
-
-    /* 3. Interactive Lab Cards */
-    .lab-card {
-        border: none;
-        border-radius: 12px;
-        overflow: hidden;
-        background: #fff;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .lab-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-
-    .lab-image {
-        filter: grayscale(20%); /* Softens the B&W look */
-        transition: filter 0.3s ease;
-    }
-
-    .lab-card:hover .lab-image { filter: grayscale(0%); }
-
-    /* 4. Filter Chips - Minimalist Upgrade */
-    .chip {
-        background: #f1f5f9;
-        color: var(--text-secondary);
-        border: 1px solid transparent;
-        transition: all 0.2s;
-    }
-
-    .chip.active {
-        background: var(--primary-green);
-        color: #fff;
-    }
-
-    .chip:not(.active):hover {
-        background: #e2e8f0;
-        color: #1e293b;
-    }
-
-    /* Typography Polish */
-    h1, h2 { letter-spacing: -0.5px; }
-
-  </style>
 </head>
 <body>
 
+<%-- ── NAVBAR ─────────────────────────────────────────────── --%>
 <nav class="top-navbar">
-  <div class="nav-left-section">
-    <a href="${pageContext.request.contextPath}/test-index.html" class="nav-brand" style="text-decoration:none; color:white;">
+  <div style="display:flex;align-items:center;gap:28px;">
+    <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
+      
       <div class="nav-brand-text">
-        <strong>EBS</strong><span style="opacity: 0.8;"> Lecturer</span>
+        <strong>EBS</strong><span> Lecturer</span>
       </div>
     </a>
-  </div>
+    <nav class="nav-menu">
+      <a href="${pageContext.request.contextPath}/lecturer/dashboard">Dashboard</a>
+      <a href="${pageContext.request.contextPath}/lecturer/book-lab">Book Lab</a>
+      <a href="${pageContext.request.contextPath}/lecturer/bookings">My Bookings</a>
 
-  <div class="nav-menu">
-    <a href="${pageContext.request.contextPath}/lecturer/dashboard" class="primary-btn">Dashboard</a>
-    <a href="${pageContext.request.contextPath}/lecturer/book-lab" class="primary-btn">Book Lab</a>
-    <a href="${pageContext.request.contextPath}/lecturer/bookings" class="primary-btn">My Bookings</a>
-  </div>
+      <a href="${pageContext.request.contextPath}/lecturer/book-lab" class="primary-btn">
+        + New Reservation
+      </a>
 
+      <a href="${pageContext.request.contextPath}/lecturer/book-lab?labId=${lab.id}" class="btn-main">
+        Book Lab
+      </a>
+    </nav>
+  </div>
   <div class="nav-right">
-    <span class="user-chip" style="color:white; font-size: 0.9rem;">👨‍🏫 ${sessionScope.userName}</span>
-    <a href="${pageContext.request.contextPath}/logout" class="logout-link" style="color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem;">Logout</a>
+    <span class="user-chip">👨‍🏫 ${sessionScope.userName}</span>
+    <a href="${pageContext.request.contextPath}/logout" class="logout-link">Logout</a>
   </div>
 </nav>
 
+<%-- ── MAIN ──────────────────────────────────────────────── --%>
 <div class="main-content">
 
+  <%-- Flash --%>
   <c:if test="${not empty flashMsg}">
     <div class="flash ${flashType}">${flashMsg}</div>
   </c:if>
+  <c:if test="${not empty loadError}">
+    <div class="flash error">${loadError}</div>
+  </c:if>
 
+  <%-- Header --%>
   <div class="page-header">
     <div>
-      <h1 style="color: #1e293b;">Lecturer Dashboard</h1>
-      <p style="color: var(--text-secondary);">Manage lab reservations and view upcoming blocks</p>
+      <h1>Lecturer Dashboard</h1>
+      <p>Manage lab reservations and view upcoming blocks</p>
     </div>
-    <a href="${pageContext.request.contextPath}/lecturer/book-lab" class="primary-btn" style="background: var(--primary-green); border-radius: 10px; padding: 12px 24px;">
+    <%--
+      PRIMARY ACTION — links to /lecturer/book-lab (GET)
+      LecturerServlet.doGet loads labs from DB and forwards to book_lab.jsp
+    --%>
+    <a href="${pageContext.request.contextPath}/lecturer/book-lab" class="primary-btn">
       + New Reservation
     </a>
   </div>
 
+  <%-- Stats --%>
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-label">Upcoming Blocks</div>
+      <h4>Upcoming Blocks</h4>
       <div class="stat-number">${empty blocks ? 0 : fn:length(blocks)}</div>
-      <div class="stat-label" style="text-transform: none;">Confirmed reservations</div>
+      <div class="stat-label">Confirmed reservations</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Available Labs</div>
+      <h4>Available Labs</h4>
       <div class="stat-number">${empty labs ? 0 : fn:length(labs)}</div>
-      <div class="stat-label" style="text-transform: none;">Ready to reserve</div>
+      <div class="stat-label">Ready to reserve</div>
     </div>
   </div>
 
-  <div class="section-title" style="margin-top: 40px; font-weight: 700; color: #334155;">Available Venues</div>
-  
-  <div class="toolbar" style="background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-    <input type="text" class="search-box" id="labSearch" placeholder="Search by name or building…" style="border: 1px solid #e2e8f0; border-radius: 8px;">
+  <%-- Toolbar --%>
+  <div class="section-title">Available Venues</div>
+  <div class="toolbar">
+    <input type="text" class="search-box" id="labSearch" placeholder="Search by name or building…">
     <div class="filter-chips">
       <button class="chip active" data-filter="all">All</button>
       <button class="chip" data-filter="computer">Computer Labs</button>
@@ -194,7 +93,8 @@
     </div>
   </div>
 
-  <div class="lab-grid" id="labGrid" style="margin-top: 25px;">
+  <%-- Lab Grid --%>
+  <div class="lab-grid" id="labGrid">
     <c:choose>
       <c:when test="${empty labs}">
         <div class="empty-state">
@@ -205,44 +105,46 @@
       </c:when>
       <c:otherwise>
         <c:forEach var="lab" items="${labs}">
+          <%-- Determine card type for filter chips --%>
           <c:set var="isComputer" value="${fn:containsIgnoreCase(lab.labName,'Lab') or fn:containsIgnoreCase(lab.labName,'LG')}"/>
           <c:set var="cardType"   value="${isComputer ? 'computer' : 'seminar'}"/>
 
           <div class="lab-card" data-category="${cardType}"
                data-search="${fn:toLowerCase(lab.labName)} ${fn:toLowerCase(lab.building)}">
-            
-            <%--
-              Real campus photos — computer labs cycle through 4 shots,
-              seminar/other venues cycle through 2, keyed on lab.id so
-              each venue always gets the same photo.
-            --%>
+
             <c:choose>
               <c:when test="${isComputer}">
-                <c:set var="imgFile" value="${['lab-wide.jpeg','lab-color.jpeg','lab-evening.jpeg','lab-dark.jpeg'][lab.id % 4]}"/>
+                <img src="../images/lab.jpg" alt="${lab.labName}" class="lab-image"
+                     onerror="this.src='../images/logooo.jpeg'"/>
               </c:when>
               <c:otherwise>
-                <c:set var="imgFile" value="${['seminar.jpeg','lecture-hall.jpeg'][lab.id % 2]}"/>
+                <img src="../images/LectureHall.jpg" alt="${lab.labName}" class="lab-image"
+                     onerror="this.src='../images/logooo.jpeg'"/>
               </c:otherwise>
             </c:choose>
-            <img src="../images/${imgFile}"
-                 alt="${lab.labName}" class="lab-image"
-                 onerror="this.src='../images/logooo.jpeg'"/>
 
-            <div class="lab-body" style="padding: 20px;">
-              <span class="lab-tag ${isComputer ? 'tag-blue' : 'tag-green'}" style="font-size: 0.7rem; font-weight: 700;">
+            <div class="lab-body">
+              <span class="lab-tag ${isComputer ? 'tag-blue' : 'tag-green'}">
                 ${isComputer ? '💻 COMPUTER LAB' : '🏛️ SEMINAR ROOM'}
               </span>
-              <div class="lab-title" style="font-size: 1.2rem; margin: 10px 0 5px 0;">${lab.labName}</div>
-              <div class="lab-meta" style="color: var(--text-secondary); font-size: 0.85rem;">${lab.building} &bull; Capacity: ${lab.capacity}</div>
+              <div class="lab-title">${lab.labName}</div>
+              <div class="lab-meta">${lab.building} &bull; Capacity: ${lab.capacity}</div>
+              <div class="lab-status">Available for reservation</div>
 
-              <div class="card-actions" style="margin-top: 20px; display: flex; gap: 10px;">
-                <a href="${pageContext.request.contextPath}/lecturer/book-lab?labId=${lab.id}" 
-                   class="primary-btn" style="background: var(--primary-green); flex: 1; text-align: center; font-size: 0.9rem;">
+              <div class="card-actions">
+                <%--
+                  "Book Lab" and "Block Venue" both go to the SAME endpoint:
+                  GET /lecturer/book-lab?labId={id}
+                  LecturerServlet loads the form with that lab pre-selected.
+                  The POST in book_lab.jsp actually creates the reservation.
+                --%>
+                <a href="${pageContext.request.contextPath}/lecturer/book-lab?labId=${lab.id}"
+                   class="primary-btn">
                   ${isComputer ? 'Book Lab' : 'Block Venue'}
                 </a>
-                <a href="${pageContext.request.contextPath}/lecturer/bookings" 
-                   class="outline-btn" style="flex: 1; text-align: center; font-size: 0.9rem; border-radius: 8px;">
-                  View
+                <a href="${pageContext.request.contextPath}/lecturer/bookings"
+                   class="outline-btn">
+                  View Bookings
                 </a>
               </div>
             </div>
@@ -251,16 +153,68 @@
       </c:otherwise>
     </c:choose>
   </div>
-</div>
+
+  <%-- Upcoming Blocks Table --%>
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Upcoming Reservations</h2>
+      <a href="${pageContext.request.contextPath}/lecturer/bookings" class="outline-btn" style="padding:8px 16px;font-size:13px;">
+        View All →
+      </a>
+    </div>
+
+    <c:choose>
+      <c:when test="${empty blocks}">
+        <div class="table-empty-state">
+          <div class="empty-icon">🗂️</div>
+          <h3>No upcoming reservations</h3>
+          <p>Use the <strong>+ New Reservation</strong> button above to book a lab.</p>
+        </div>
+      </c:when>
+      <c:otherwise>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>Lab</th>
+                <th>Building</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <c:forEach var="block" items="${blocks}">
+                <tr>
+                  <td style="font-weight:700;">${block.moduleCode}</td>
+                  <td>${block.lab.labName}</td>
+                  <td>${block.lab.building}</td>
+                  <td>${fn:substring(block.startTime.toString(), 0, 10)}</td>
+                  <td>
+                    ${fn:substring(block.startTime.toString(), 11, 16)} –
+                    ${fn:substring(block.endTime.toString(),   11, 16)}
+                  </td>
+                  <td><span class="badge badge-green">${block.status}</span></td>
+                </tr>
+              </c:forEach>
+            </tbody>
+          </table>
+        </div>
+      </c:otherwise>
+    </c:choose>
+  </div>
+
+</div><%-- /main-content --%>
 
 <script>
-  // Lab search logic
+  // ── Lab search ───────────────────────────────────────────
   document.getElementById('labSearch').addEventListener('input', function () {
     const term = this.value.toLowerCase();
     filterCards(term, document.querySelector('.chip.active').dataset.filter);
   });
 
-  // Filter chips logic
+  // ── Filter chips ─────────────────────────────────────────
   document.querySelectorAll('.chip').forEach(function (chip) {
     chip.addEventListener('click', function () {
       document.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('active'); });

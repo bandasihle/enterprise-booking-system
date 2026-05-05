@@ -14,7 +14,6 @@ com\ebs\rest\ApplicationConfig.class
 com\ebs\servlet\ComplaintServlet.class
 com\ebs\dto\SeatDTO.class
 com\ebs\controllers\SuspendUserServlet.class
-com\ebs\auth\AdminLogoutServlet.class
 com\ebs\controllers\LecturerBlockServlet.class
 com\ebs\ejb\StudentDashboardService.class
 com\ebs\rest\BookingResource$BookingRequest.class
@@ -56,7 +55,6 @@ com\ebs\rest\AuthResource$RegisterInitRequest.class
 com\ebs\models\Lab.class
 com\ebs\util\PasswordUtil.class
 com\ebs\service\AuthService.class
-com\ebs\controllers\GetUsersServlet.class
 com\ebs\servlet\DashboardServlet.class
 com\ebs\util\EmailService.class
 com\ebs\service\ComplaintService.class
@@ -64,7 +62,6 @@ com\ebs\servlet\BookingServlet.class
 com\ebs\ejb\ComplaintService.class
 com\ebs\servlet\DbCheckServlet.class
 com\ebs\controllers\CheckSuspensionServlet.class
-com\ebs\auth\StudentLogoutServlet.class
 com\ebs\ejb\NoShowScheduler.class
 com\ebs\entity\LecturerBlock.class
 com\ebs\ejb\BanEnforcementScheduler.class
