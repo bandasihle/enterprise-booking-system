@@ -231,7 +231,7 @@
         <!-- Lab 1 — Computer Lab (LG02) -->
         <div class="venue-card" data-category="computer" data-name="lab 1 ict computer lab lg02">
             <img src="${pageContext.request.contextPath}/assets/venueImages/image1.jpg"
-                 onerror="this.src='${pageContext.request.contextPath}/images/lab.jpg'"
+                 onerror="this.src='${pageContext.request.contextPath}/images/lab.jpeg'"
                  class="venue-image" alt="Lab 1"/>
             <div class="venue-body">
                 <span class="cat-badge cat-computer"><i class="fas fa-desktop"></i> Computer Lab</span>
@@ -255,7 +255,7 @@
         <!-- Lab 2 — Computer Lab -->
         <div class="venue-card" data-category="computer" data-name="lab 2 ict computer lab">
             <img src="${pageContext.request.contextPath}/assets/venueImages/image2.jpg"
-                 onerror="this.src='${pageContext.request.contextPath}/images/lab.jpg'"
+                 onerror="this.src='${pageContext.request.contextPath}/images/lab.jpeg'"
                  class="venue-image" alt="Lab 2"/>
             <div class="venue-body">
                 <span class="cat-badge cat-computer"><i class="fas fa-desktop"></i> Computer Lab</span>
@@ -279,7 +279,7 @@
         <!-- Lab 3 — Computer Lab -->
         <div class="venue-card" data-category="computer" data-name="lab 3 ict computer lab">
             <img src="${pageContext.request.contextPath}/assets/venueImages/image3.jpg"
-                 onerror="this.src='${pageContext.request.contextPath}/images/lab.jpg'"
+                 onerror="this.src='${pageContext.request.contextPath}/images/lab.jpeg'"
                  class="venue-image" alt="Lab 3"/>
             <div class="venue-body">
                 <span class="cat-badge cat-computer"><i class="fas fa-desktop"></i> Computer Lab</span>
@@ -351,7 +351,7 @@
         <!-- Lab 6 — Study Room -->
         <div class="venue-card" data-category="study" data-name="lab 6 study room library">
             <img src="${pageContext.request.contextPath}/assets/venueImages/image6.jpg"
-                 onerror="this.src='${pageContext.request.contextPath}/images/lab.jpg'"
+                 onerror="this.src='${pageContext.request.contextPath}/images/lab.jpeg'"
                  class="venue-image" alt="Lab 6"/>
             <div class="venue-body">
                 <span class="cat-badge cat-study"><i class="fas fa-book"></i> Study Room</span>
