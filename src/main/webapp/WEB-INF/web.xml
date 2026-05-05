@@ -8,6 +8,7 @@
     <display-name>Enterprise Booking System</display-name>
 
     <welcome-file-list>
+        
         <welcome-file>test-index.html</welcome-file>
     </welcome-file-list>
 
@@ -15,7 +16,8 @@
         <session-timeout>30</session-timeout>
         <cookie-config>
             <http-only>true</http-only>
-            <secure>false</secure> </cookie-config>
+            <secure>false</secure>
+        </cookie-config>
     </session-config>
 
-    </web-app>
+</web-app>

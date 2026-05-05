@@ -21,6 +21,9 @@ import java.time.LocalDateTime;
 /**
  * GET  /student/booking?labId={id}  — renders seat grid via booking.jsp
  * POST /student/booking             — submits booking; PRG on success
+ *
+ * Maintenance guard: if the lab's status is not 'Active' the student is
+ * redirected back to the dashboard with a clear flash message.
  */
 @WebServlet("/student/booking")
 public class BookingServlet extends HttpServlet {
@@ -33,7 +36,6 @@ public class BookingServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Long studentId = getStudentId(req);
-        // Redirect to login instead of missing index.html
         if (studentId == null) {
             resp.sendRedirect(req.getContextPath() + "/pages/student/login.jsp");
             return;
@@ -47,6 +49,8 @@ public class BookingServlet extends HttpServlet {
 
         try {
             Long   labId = Long.parseLong(labIdParam);
+            // getLabWithSeats() throws IllegalStateException("LAB_UNDER_MAINTENANCE")
+            // if the lab's status is not 'Active'.
             LabDTO lab   = dashboardService.getLabWithSeats(labId);
             req.setAttribute("lab",       lab);
             req.setAttribute("studentId", studentId);
@@ -55,6 +59,15 @@ public class BookingServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             resp.sendRedirect(req.getContextPath() + "/student/dashboard");
             return;
+        } catch (IllegalStateException e) {
+            if ("LAB_UNDER_MAINTENANCE".equals(e.getMessage())) {
+                // Redirect to dashboard with a friendly message
+                req.getSession().setAttribute("flash",
+                    "⚠️ That lab is currently under maintenance and cannot be booked.");
+                resp.sendRedirect(req.getContextPath() + "/student/dashboard");
+                return;
+            }
+            req.setAttribute("loadError", true);
         } catch (Exception e) {
             req.setAttribute("loadError", true);
         }
@@ -67,7 +80,6 @@ public class BookingServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Long studentId = getStudentId(req);
-        // Redirect to login instead of missing index.html
         if (studentId == null) {
             resp.sendRedirect(req.getContextPath() + "/pages/student/login.jsp");
             return;
@@ -84,7 +96,6 @@ public class BookingServlet extends HttpServlet {
         try {
             Booking booking = bookingService.bookSeat(studentId, seatId, start, end);
 
-            // PRG — flash message then redirect to My Bookings
             req.getSession().setAttribute("flash",
                     "✅ Booking confirmed! Seat " +
                     booking.getSeat().getSeatNumber() + " is reserved from " +
@@ -94,12 +105,22 @@ public class BookingServlet extends HttpServlet {
 
         } catch (Exception e) {
             Throwable cause = (e instanceof EJBException) ? e.getCause() : e;
+            String msg = (cause != null) ? cause.getMessage() : "";
 
             String errorCode;
             if      (cause instanceof SecurityException)       errorCode = "USER_BANNED";
             else if (cause instanceof OptimisticLockException) errorCode = "SEAT_TAKEN";
-            else if ("SEAT_TAKEN".equals(cause != null ? cause.getMessage() : "")) errorCode = "SEAT_TAKEN";
+            else if ("SEAT_TAKEN".equals(msg))                 errorCode = "SEAT_TAKEN";
+            else if ("LAB_UNDER_MAINTENANCE".equals(msg))      errorCode = "LAB_UNDER_MAINTENANCE";
             else                                               errorCode = "BOOKING_FAILED";
+
+            // If the lab is under maintenance, send the student back to dashboard
+            if ("LAB_UNDER_MAINTENANCE".equals(errorCode)) {
+                req.getSession().setAttribute("flash",
+                    "⚠️ That lab is currently under maintenance and cannot be booked.");
+                resp.sendRedirect(req.getContextPath() + "/student/dashboard");
+                return;
+            }
 
             try {
                 LabDTO lab = dashboardService.getLabWithSeats(labId);

@@ -22,10 +22,6 @@ public class ComplaintServlet extends HttpServlet {
         sb.append("{\"complaints\":[");
 
         try (Connection conn = DatabaseConnection.getConnection()) {
-            /*
-             * Adjust column names to match your complaints table schema.
-             * Common columns: id, user_id, description, category, status, resolution, created_at
-             */
             String sql =
                 "SELECT c.ID as id, " +
                 "       u.full_name AS student_name, u.EMAIL AS student_email, " +
@@ -79,12 +75,12 @@ public class ComplaintServlet extends HttpServlet {
             String json = body.toString();
 
             if ("/resolve".equals(pathInfo)) {
-                String idStr     = extractJson(json, "id");
+                String idStr = extractJson(json, "id");
                 String resolution = extractJson(json, "resolution");
+                // Automatically set status to "Resolved" with the provided resolution text
                 updateStatus(Integer.parseInt(idStr), "Resolved", resolution, out);
 
             } else if ("/resolve-batch".equals(pathInfo)) {
-                // Parse array of IDs: {"ids":[1,2,3]}
                 int startIdx = json.indexOf("[");
                 int endIdx   = json.indexOf("]");
                 if (startIdx < 0 || endIdx < 0) {
@@ -96,7 +92,7 @@ public class ComplaintServlet extends HttpServlet {
                     for (String part : parts) {
                         int id = Integer.parseInt(part.trim());
                         PreparedStatement ps = conn.prepareStatement(
-                            "UPDATE complaints SET status='Resolved' WHERE id=?"
+                            "UPDATE complaints SET status='Resolved', resolution='Automatically approved via batch' WHERE id=?"
                         );
                         ps.setInt(1, id);
                         ps.executeUpdate();

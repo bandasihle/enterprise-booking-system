@@ -32,7 +32,7 @@ public class LoginServlet extends HttpServlet {
         if ("/logout".equals(req.getServletPath())) {
             HttpSession s = req.getSession(false);
             if (s != null) s.invalidate();
-            resp.sendRedirect(req.getContextPath() + "/index.jsp");
+            resp.sendRedirect(req.getContextPath() + "/test-index.html");
         } else {
             resp.sendRedirect(req.getContextPath() + "/pages/student/login.jsp");
         }
@@ -47,7 +47,7 @@ public class LoginServlet extends HttpServlet {
         if ("/logout".equals(req.getServletPath())) {
             HttpSession s = req.getSession(false);
             if (s != null) s.invalidate();
-            resp.sendRedirect(req.getContextPath() + "/index.jsp");
+            resp.sendRedirect(req.getContextPath() + "/test-index.html");
             return;
         }
 
@@ -108,7 +108,7 @@ public class LoginServlet extends HttpServlet {
                     resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
                     break;
                 default:
-                    resp.sendRedirect(req.getContextPath() + "/index.jsp");
+                    resp.sendRedirect(req.getContextPath() + "/test-index.html");
             }
 
         } catch (NoResultException e) {

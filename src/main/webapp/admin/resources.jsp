@@ -65,12 +65,32 @@
     .modal-actions .cancel-btn:hover { background: #f5f5f5; }
     .modal-actions .primary-btn { padding: 0.55rem 1.4rem; }
 
-    #modalError {
+    .modal-error {
       color: #c00;
       font-size: 0.85rem;
       margin-bottom: 0.75rem;
       display: none;
     }
+
+    .modal-hint {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: -0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Maintenance warning pill inside edit modal */
+    .maintenance-warning {
+      background: #fff7ed;
+      border: 1px solid #fb923c;
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.82rem;
+      color: #9a3412;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .maintenance-warning.visible { display: block; }
   </style>
 </head>
 <body>
@@ -120,7 +140,7 @@
     <section class="panel">
       <div class="panel-header">
         <h2>Lab Resource Table</h2>
-        <button class="panel-btn">Update Status</button>
+        <button class="panel-btn" onclick="loadLabs()">Refresh</button>
       </div>
       <div class="table-wrapper">
         <table>
@@ -146,7 +166,7 @@
   <div class="modal-overlay" id="addLabModal">
     <div class="modal-box">
       <h2>Add New Lab</h2>
-      <div id="modalError"></div>
+      <div class="modal-error" id="addModalError"></div>
 
       <label for="labName">Lab Name</label>
       <input type="text" id="labName" placeholder="e.g. Lab A" />
@@ -163,6 +183,40 @@
       <div class="modal-actions">
         <button class="cancel-btn" id="closeAddLabBtn">Cancel</button>
         <button class="primary-btn" id="submitAddLabBtn">Add Lab</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Edit Lab Modal ── -->
+  <div class="modal-overlay" id="editLabModal">
+    <div class="modal-box">
+      <h2>Edit Lab</h2>
+      <div class="modal-error" id="editModalError"></div>
+
+      <input type="hidden" id="editLabId" />
+
+      <label for="editLabName">Lab Name</label>
+      <input type="text" id="editLabName" placeholder="e.g. Lab A" />
+
+      <label for="editLabTotalPcs">Total PCs</label>
+      <input type="number" id="editLabTotalPcs" min="1" />
+      <p class="modal-hint">You can only increase the number of PCs, not decrease.</p>
+
+      <label for="editLabStatus">Status</label>
+      <select id="editLabStatus">
+        <option value="Active">Active</option>
+        <option value="Maintenance">Maintenance</option>
+      </select>
+
+      <!-- Warn admin what happens when setting to Maintenance -->
+      <div class="maintenance-warning" id="maintenanceWarning">
+        ⚠️ Setting this lab to <strong>Maintenance</strong> will immediately lock all its seats.
+        Students and lecturers will not be able to book it until it is set back to Active.
+      </div>
+
+      <div class="modal-actions">
+        <button class="cancel-btn" id="closeEditLabBtn">Cancel</button>
+        <button class="primary-btn" id="submitEditLabBtn">Save Changes</button>
       </div>
     </div>
   </div>
@@ -207,33 +261,25 @@
             var lab  = labs[j];
             var bc2  = lab.status === 'Active' ? 'success' : 'warning';
             var booked = Math.max((lab.total_pcs || 0) - (lab.available_pcs || 0), 0);
-            html += '<tr data-labid="' + lab.id + '">'
+            html += '<tr>'
               + '<td>' + esc(lab.name) + '</td>'
               + '<td>' + lab.total_pcs + '</td>'
               + '<td>' + lab.available_pcs + '</td>'
               + '<td>' + booked + '</td>'
               + '<td><span class="badge ' + bc2 + '">' + esc(lab.status) + '</span></td>'
-              + '<td><button class="table-btn" data-labid="' + lab.id + '" data-action="edit">Edit</button></td>'
+              + '<td>'
+              +   '<button class="table-btn" '
+              +     'data-action="edit" '
+              +     'data-labid="'    + lab.id        + '" '
+              +     'data-name="'     + esc(lab.name) + '" '
+              +     'data-totalpcs="' + lab.total_pcs + '" '
+              +     'data-status="'   + esc(lab.status) + '">'
+              +   'Edit'
+              +   '</button>'
+              + '</td>'
               + '</tr>';
           }
           tbody.innerHTML = html;
-
-          // Edit button — toggle Active / Maintenance
-          tbody.addEventListener('click', function(e) {
-            var btn = e.target.closest('[data-action="edit"]');
-            if (!btn) return;
-            var labId = btn.dataset.labid;
-            var row   = btn.closest('tr');
-            var badge = row.querySelector('.badge');
-            var newStatus = badge.textContent.trim() === 'Active' ? 'Maintenance' : 'Active';
-            fetch('../api/labs/update', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: '{"id":"' + labId + '","status":"' + newStatus + '"}'
-            }).then(function(r){ return r.json(); })
-              .then(function(res){ if (res.success) loadLabs(); else alert(res.message || 'Failed'); })
-              .catch(function(){ alert('Server error.'); });
-          });
         })
         .catch(function() {
           document.getElementById('resourcesTableBody').innerHTML =
@@ -243,53 +289,46 @@
         });
     }
 
-    /* ── Modal open / close ── */
-    var modal        = document.getElementById('addLabModal');
-    var modalError   = document.getElementById('modalError');
+    /* ─────────────────────────────────────────────
+       ADD LAB MODAL
+    ───────────────────────────────────────────── */
+    var addModal      = document.getElementById('addLabModal');
+    var addModalError = document.getElementById('addModalError');
 
-    function openModal() {
+    function openAddModal() {
       document.getElementById('labName').value     = '';
       document.getElementById('labTotalPcs').value = '';
       document.getElementById('labStatus').value   = 'Active';
-      modalError.style.display = 'none';
-      modalError.textContent   = '';
-      modal.classList.add('open');
+      addModalError.style.display = 'none';
+      addModalError.textContent   = '';
+      addModal.classList.add('open');
       document.getElementById('labName').focus();
     }
 
-    function closeModal() {
-      modal.classList.remove('open');
-    }
+    function closeAddModal() { addModal.classList.remove('open'); }
 
-    document.getElementById('openAddLabBtn').addEventListener('click', openModal);
-    document.getElementById('closeAddLabBtn').addEventListener('click', closeModal);
+    document.getElementById('openAddLabBtn').addEventListener('click', openAddModal);
+    document.getElementById('closeAddLabBtn').addEventListener('click', closeAddModal);
+    addModal.addEventListener('click', function(e) { if (e.target === addModal) closeAddModal(); });
 
-    // Close when clicking outside the box
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) closeModal();
-    });
-
-    /* ── Submit Add Lab ── */
     document.getElementById('submitAddLabBtn').addEventListener('click', function () {
       var name     = document.getElementById('labName').value.trim();
       var totalPcs = document.getElementById('labTotalPcs').value.trim();
       var status   = document.getElementById('labStatus').value;
 
-      // Basic validation
       if (!name) {
-        modalError.textContent   = 'Lab name is required.';
-        modalError.style.display = 'block';
+        addModalError.textContent   = 'Lab name is required.';
+        addModalError.style.display = 'block';
         document.getElementById('labName').focus();
         return;
       }
       if (!totalPcs || isNaN(totalPcs) || parseInt(totalPcs) < 1) {
-        modalError.textContent   = 'Enter a valid number of PCs (minimum 1).';
-        modalError.style.display = 'block';
+        addModalError.textContent   = 'Enter a valid number of PCs (minimum 1).';
+        addModalError.style.display = 'block';
         document.getElementById('labTotalPcs').focus();
         return;
       }
 
-      // Disable button to prevent double submit
       var btn = document.getElementById('submitAddLabBtn');
       btn.disabled    = true;
       btn.textContent = 'Adding...';
@@ -297,25 +336,19 @@
       fetch('../api/labs/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name:      name,
-          total_pcs: totalPcs,
-          status:    status
-        })
+        body: JSON.stringify({ name: name, total_pcs: totalPcs, status: status })
       })
       .then(function(r) { return r.json(); })
       .then(function(res) {
-        if (res.success) {
-          closeModal();
-          loadLabs(); // ← refreshes table and cards immediately
-        } else {
-          modalError.textContent   = res.message || 'Failed to add lab.';
-          modalError.style.display = 'block';
+        if (res.success) { closeAddModal(); loadLabs(); }
+        else {
+          addModalError.textContent   = res.message || 'Failed to add lab.';
+          addModalError.style.display = 'block';
         }
       })
       .catch(function() {
-        modalError.textContent   = 'Server error. Please try again.';
-        modalError.style.display = 'block';
+        addModalError.textContent   = 'Server error. Please try again.';
+        addModalError.style.display = 'block';
       })
       .finally(function() {
         btn.disabled    = false;
@@ -323,8 +356,101 @@
       });
     });
 
-   /* ── Init ── */
-loadLabs(); // Call it directly since the script is already at the end of the body
+    /* ─────────────────────────────────────────────
+       EDIT LAB MODAL
+    ───────────────────────────────────────────── */
+    var editModal      = document.getElementById('editLabModal');
+    var editModalError = document.getElementById('editModalError');
+    var maintWarning   = document.getElementById('maintenanceWarning');
+
+    function openEditModal(labId, name, totalPcs, status) {
+      document.getElementById('editLabId').value       = labId;
+      document.getElementById('editLabName').value     = name;
+      document.getElementById('editLabTotalPcs').value = totalPcs;
+      document.getElementById('editLabStatus').value   = status;
+      editModalError.style.display = 'none';
+      editModalError.textContent   = '';
+      // Show maintenance warning if already under maintenance
+      maintWarning.classList.toggle('visible', status === 'Maintenance');
+      editModal.classList.add('open');
+      document.getElementById('editLabName').focus();
+    }
+
+    function closeEditModal() { editModal.classList.remove('open'); }
+
+    document.getElementById('closeEditLabBtn').addEventListener('click', closeEditModal);
+    editModal.addEventListener('click', function(e) { if (e.target === editModal) closeEditModal(); });
+
+    // Toggle maintenance warning live as admin changes the dropdown
+    document.getElementById('editLabStatus').addEventListener('change', function() {
+      maintWarning.classList.toggle('visible', this.value === 'Maintenance');
+    });
+
+    // Delegate click on Edit buttons in the table
+    document.getElementById('resourcesTableBody').addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-action="edit"]');
+      if (!btn) return;
+      openEditModal(
+        btn.dataset.labid,
+        btn.dataset.name,
+        btn.dataset.totalpcs,
+        btn.dataset.status
+      );
+    });
+
+    document.getElementById('submitEditLabBtn').addEventListener('click', function () {
+      var labId    = document.getElementById('editLabId').value;
+      var name     = document.getElementById('editLabName').value.trim();
+      var totalPcs = document.getElementById('editLabTotalPcs').value.trim();
+      var status   = document.getElementById('editLabStatus').value;
+
+      if (!name) {
+        editModalError.textContent   = 'Lab name is required.';
+        editModalError.style.display = 'block';
+        document.getElementById('editLabName').focus();
+        return;
+      }
+      if (!totalPcs || isNaN(totalPcs) || parseInt(totalPcs) < 1) {
+        editModalError.textContent   = 'Enter a valid number of PCs (minimum 1).';
+        editModalError.style.display = 'block';
+        document.getElementById('editLabTotalPcs').focus();
+        return;
+      }
+
+      var btn = document.getElementById('submitEditLabBtn');
+      btn.disabled    = true;
+      btn.textContent = 'Saving...';
+
+      fetch('../api/labs/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id:        labId,
+          name:      name,
+          total_pcs: totalPcs,
+          status:    status
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (res.success) { closeEditModal(); loadLabs(); }
+        else {
+          editModalError.textContent   = res.message || 'Failed to update lab.';
+          editModalError.style.display = 'block';
+        }
+      })
+      .catch(function() {
+        editModalError.textContent   = 'Server error. Please try again.';
+        editModalError.style.display = 'block';
+      })
+      .finally(function() {
+        btn.disabled    = false;
+        btn.textContent = 'Save Changes';
+      });
+    });
+
+    /* ── Init ── */
+    loadLabs();
   })();
   </script>
 

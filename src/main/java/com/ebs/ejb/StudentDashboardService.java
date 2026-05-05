@@ -36,12 +36,13 @@ public class StudentDashboardService {
     // ─────────────────────────────────────────────────────────────
 
     /**
-     * All labs with a live available-seat count each.
-     * Uses a subquery COUNT per lab to avoid N+1 fetching.
+     * Only returns ACTIVE labs — maintenance labs are hidden from students.
      */
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public List<LabDTO> getAllLabsWithAvailability() {
-        List<Lab> labs = em.createQuery("SELECT l FROM Lab l", Lab.class)
+        // Only fetch labs that are Active — students must never see Maintenance labs.
+        List<Lab> labs = em.createQuery(
+                "SELECT l FROM Lab l WHERE l.status = 'Active'", Lab.class)
                            .getResultList();
 
         return labs.stream().map(lab -> {
@@ -59,12 +60,18 @@ public class StudentDashboardService {
     /**
      * Single lab including full seat map — used by booking.jsp to render the grid.
      *
-     * @throws NotFoundException if no lab with that ID exists
+     * @throws IllegalStateException if the lab is under maintenance
+     * @throws NotFoundException     if no lab with that ID exists
      */
     @TransactionAttribute(TransactionAttributeType.SUPPORTS)
     public LabDTO getLabWithSeats(Long labId) {
         Lab lab = em.find(Lab.class, labId);
         if (lab == null) throw new NotFoundException("Lab not found: " + labId);
+
+        // Gate: block access to labs that are not Active
+        if (!"Active".equalsIgnoreCase(lab.getStatus())) {
+            throw new IllegalStateException("LAB_UNDER_MAINTENANCE");
+        }
 
         List<SeatDTO> seats = em.createQuery(
                 "SELECT s FROM Seat s WHERE s.lab.id = :labId ORDER BY s.seatNumber",

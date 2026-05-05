@@ -301,7 +301,7 @@
     <div class="btn-group">
       <a href="pages/student/login.jsp"  class="role-btn">🎓 Student Login</a>
       <a href="pages/lecturer/login.jsp" class="role-btn">👨‍🏫 Lecturer Login</a>
-      <a href="pages/admin/login.jsp"    class="role-btn admin">🛡️ Admin</a>
+      
     </div>
   </div>
 
